@@ -1,0 +1,2197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>央美 → 外企 · 三年打卡计划</title>
+<meta name="description" content="产品设计 · 雅思 · 作品集 · 外企求职 完整体验打卡小程序">
+<style>
+/* SECTION: app-style — 全局样式（暖白底 / 靛蓝主色 / 金色点缀） */
+:root{
+  --bg:#F6F7F8; --card:#FFFFFF; --ink:#14161B; --ink2:#5D6570;
+  --primary:#1E2A3E; --primary-soft:#EDF0F5; --gold:#3B6C70; --gold-soft:#E7EFEF;
+  --line:#E6E8EC; --danger:#9E3B34; --ok:#3E6E5C;
+  --radius:14px; --shadow:0 10px 30px rgba(20,24,32,.05);
+  --radius-sm:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue","Noto Sans SC",sans-serif;
+  background:var(--bg);color:var(--ink);font-size:15px;line-height:1.6;
+  max-width:760px;margin:0 auto;
+}
+body.no-scroll{overflow:hidden}
+::selection{background:var(--gold-soft)}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input{font-family:inherit}
+
+/* ===== 顶部 ===== */
+.app-header{
+  position:sticky;top:0;z-index:30;
+  background:linear-gradient(160deg,var(--bg) 0%,#FFFFFF 100%);
+  padding:18px 20px 12px;
+  border-bottom:1px solid var(--line);
+}
+.header-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand-logo{
+  width:40px;height:40px;border-radius:12px;flex:none;
+  background:linear-gradient(135deg,var(--primary),#31435F);
+  display:flex;align-items:center;justify-content:center;color:#fff;
+  font-weight:800;font-size:18px;box-shadow:0 6px 14px rgba(30,42,62,.28);
+}
+.brand h1{font-size:17px;font-weight:800;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand p{font-size:11px;color:var(--ink2)}
+.header-dyn{display:flex;align-items:center;gap:10px}
+.header-stage-chip{
+  font-size:11.5px;font-weight:600;color:var(--ink2);
+  background:var(--card);border:1px solid var(--line);border-radius:999px;
+  padding:5px 11px;max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.ring-box{position:relative;width:46px;height:46px;display:flex;align-items:center;justify-content:center}
+.ring-box .ring-num{position:absolute;font-size:10.5px;font-weight:800}
+.ring{display:block}
+.header-date{
+  margin-top:10px;font-size:12px;color:var(--ink2);
+  display:flex;align-items:center;gap:6px;
+}
+.header-date::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold);flex:none}
+
+/* ===== 视图容器 ===== */
+.view{display:none;padding:16px 16px 120px}
+.view.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.section-title{font-size:16px;font-weight:800;margin:6px 2px 12px;display:flex;align-items:center;gap:8px}
+.section-title small{font-weight:500;color:var(--ink2);font-size:12px}
+
+/* ===== 旅程地图 ===== */
+.stage-card{
+  background:var(--card);border-radius:var(--radius);padding:16px;
+  box-shadow:var(--shadow);border:1px solid var(--line);
+  display:flex;gap:14px;margin-bottom:14px;cursor:pointer;
+  transition:transform .15s ease,box-shadow .15s ease;position:relative;overflow:hidden;
+}
+.stage-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--ac,#ccc)}
+.stage-card:active{transform:scale(.985)}
+.stage-card:hover{box-shadow:0 14px 34px rgba(20,24,32,.08)}
+.tl-badge{
+  min-width:42px;height:42px;border-radius:999px;flex:none;padding:0 10px;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:13px;color:#fff;letter-spacing:.5px;
+  background:linear-gradient(135deg,var(--ac),color-mix(in srgb,var(--ac) 60%,#333));
+}
+.tl-badge.done{background:linear-gradient(135deg,#3E8A72,#2E6B59)}
+.tl-badge.now{box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 20%,transparent)}
+.stage-card-body{flex:1;min-width:0}
+.stage-card-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.stage-card-top h3{font-size:15.5px;font-weight:800}
+.stage-time{font-size:11px;color:var(--ink2);white-space:nowrap}
+.stage-tagline{font-size:12.5px;color:var(--ink2);margin-top:3px}
+.mini-progress{display:flex;align-items:center;gap:8px;margin-top:10px}
+.mini-bar{flex:1;height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.mini-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--ac),color-mix(in srgb,var(--ac) 55%,#fff));border-radius:99px;transition:width .4s}
+.mini-progress span{font-size:11px;font-weight:700;color:var(--ink2)}
+.stage-status-chip{
+  display:inline-block;margin-top:10px;font-size:11px;font-weight:700;
+  padding:3px 10px;border-radius:99px;
+}
+.stage-status-chip.done{background:#E4EFEA;color:var(--ok)}
+.stage-status-chip.now{background:var(--gold-soft);color:#33605F}
+.stage-status-chip.todo{background:#EEEFF2;color:var(--ink2)}
+
+/* ===== 阶段详情 sheet ===== */
+.sheet{position:fixed;inset:0;z-index:60;display:none}
+.sheet.open{display:block}
+.sheet-mask{position:absolute;inset:0;background:rgba(16,18,22,.42);backdrop-filter:blur(2px);animation:fadeIn .25s}
+.sheet-panel{
+  position:absolute;left:50%;top:12px;bottom:12px;transform:translateX(-50%);
+  width:min(680px,calc(100vw - 16px));
+  background:var(--bg);border-radius:22px;box-shadow:0 24px 60px rgba(0,0,0,.3);
+  display:flex;flex-direction:column;overflow:hidden;animation:sheetUp .3s cubic-bezier(.2,.8,.3,1);
+}
+@keyframes sheetUp{from{opacity:0;transform:translate(-50%,32px)}to{opacity:1;transform:translate(-50%,0)}}
+.sheet-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 20px 12px;flex:none;
+}
+.sheet-head h3{font-size:15px;font-weight:800}
+.sheet-close{
+  width:32px;height:32px;border-radius:50%;background:var(--card);
+  border:1px solid var(--line);font-size:16px;color:var(--ink2);
+  display:flex;align-items:center;justify-content:center;
+}
+.sheet-scroll{flex:1;overflow-y:auto;padding:4px 20px 30px;-webkit-overflow-scrolling:touch}
+.detail-hero{
+  border-radius:var(--radius);padding:20px 18px;margin-bottom:18px;
+  border:1px solid var(--line);
+}
+.detail-hero-no{font-size:11px;font-weight:800;letter-spacing:2px}
+.detail-hero h2{font-size:20px;font-weight:800;margin-top:4px}
+.detail-time{font-size:12px;color:var(--ink2);margin-top:2px}
+.detail-tagline{font-size:13px;color:var(--ink2);margin-top:8px}
+.detail-sec{margin-bottom:20px}
+.detail-sec h4{font-size:13.5px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.detail-sec h4::before{content:"";width:4px;height:14px;border-radius:99px;background:var(--ac,#1E2A3E);flex:none;display:block}
+.dot-list{list-style:none;padding:0}
+.dot-list li{position:relative;padding-left:18px;font-size:13.5px;color:#35313B;margin-bottom:8px;line-height:1.65}
+.dot-list li::before{content:"";position:absolute;left:2px;top:9px;width:6px;height:6px;border-radius:50%;background:var(--ac,#1E2A3E);opacity:.7}
+.node-list{list-style:none;padding:0}
+.node-list li{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius-sm);margin-bottom:8px}
+.node-list b{font-size:12px;font-weight:800;color:var(--ac,#1E2A3E);white-space:nowrap;background:color-mix(in srgb,var(--ac,#1E2A3E) 10%,#fff);padding:2px 8px;border-radius:99px}
+.node-list span{font-size:13px}
+.callout{
+  background:var(--gold-soft);border:1px solid #D8E4E4;border-radius:var(--radius-sm);
+  padding:12px 14px;font-size:13px;color:#33525A;
+}
+.check-list{list-style:none;padding:0}
+.check-list li{position:relative;padding-left:26px;font-size:13px;color:#35313B;margin-bottom:8px}
+.check-list li::before{
+  content:"✓";position:absolute;left:0;top:0;width:18px;height:18px;border-radius:6px;
+  background:var(--gold-soft);color:#33605F;font-size:11px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+}
+.task-list{display:flex;flex-direction:column;gap:8px}
+.task-chip-row{
+  display:flex;align-items:flex-start;gap:10px;
+  background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:11px 12px;cursor:pointer;transition:all .15s;font-size:13.5px;
+}
+.task-chip-row.checked{background:#F3F6EE;border-color:#DEE7E0}
+.task-chip-row input{display:none}
+.task-chip-row .tick{
+  width:20px;height:20px;border-radius:7px;border:2px solid #C6CBD3;flex:none;
+  display:flex;align-items:center;justify-content:center;margin-top:1px;
+  transition:all .15s;
+}
+.task-chip-row.checked .tick{background:var(--ok);border-color:var(--ok)}
+.task-chip-row.checked .tick::after{content:"✓";color:#fff;font-size:12px;font-weight:800}
+.task-txt{flex:1;min-width:0;color:#35313B}
+.task-chip-row.checked .task-txt{color:#3D6B5C;text-decoration:line-through;text-decoration-color:rgba(122,138,111,.5)}
+.task-txt em{display:block;font-style:normal;font-size:11px;color:var(--ink2);margin-bottom:2px}
+.tag-w{font-style:normal;font-size:10px;font-weight:700;color:var(--ok);background:#E4EFEA;padding:1px 6px;border-radius:99px;margin-left:6px;white-space:nowrap}
+.company-cat{margin-bottom:16px}
+.company-cat-name{font-size:12.5px;font-weight:800;color:var(--ac,#1E2A3E);margin-bottom:8px}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.chip{font-size:12px;font-weight:600;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:5px 12px;color:#3B3644}
+.chip.clickable{background:var(--primary-soft);border-color:#D8DFEA;color:var(--primary);cursor:pointer}
+.chip.clickable:active{transform:scale(.95)}
+.co-cell{font-weight:700 !important;color:var(--primary) !important;cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}
+.co-cell:active{background:var(--primary-soft)}
+/* 公司详情弹层 */
+.co-intro{font-size:13.5px;color:#35313B;line-height:1.8}
+.co-req{display:flex;gap:10px;align-items:flex-start;background:var(--primary-soft);border:1px solid #D8DFEA;border-radius:var(--radius-sm);padding:12px 14px}
+.co-req svg{width:18px;height:18px;flex:none;margin-top:2px;color:var(--primary)}
+.co-req p{font-size:13px;color:#3B3644;line-height:1.7}
+.co-path-note{font-size:12px;color:var(--ink2);margin-bottom:12px}
+.co-path{display:flex;flex-direction:column;gap:8px}
+.co-path-step{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13px;color:#35313B}
+.co-path-no{width:22px;height:22px;border-radius:50%;flex:none;background:var(--primary-soft);color:var(--primary);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.sec-sub{font-size:11px;font-weight:500;color:var(--ink2);margin-left:6px}
+.tag-node{font-style:normal;font-size:10px;font-weight:700;color:var(--primary);background:var(--primary-soft);padding:1px 6px;border-radius:99px;margin-left:6px;white-space:nowrap}
+.node-row .tick{border-color:#CBD3E0}
+/* 薪资折叠与标签 */
+.salary-legend{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0 4px}
+.salary-legend b{font-size:11.5px;color:#33525A;margin-left:auto;font-weight:600}
+.tag-badge{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:99px;margin-right:6px;vertical-align:middle}
+.cell-tags{margin-bottom:3px}
+.salary-fold{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--card);margin-bottom:10px;overflow:hidden}
+.salary-fold-head{width:100%;display:flex;align-items:center;gap:8px;padding:14px 16px;background:#FAFBFC;font-size:13.5px;font-weight:800;color:#2E2A33;text-align:left}
+.salary-fold-head em{font-style:normal;font-size:11px;font-weight:600;color:var(--ink2);background:#EEEFF2;padding:2px 8px;border-radius:99px;margin-left:auto}
+.fold-arrow{width:8px;height:8px;border-right:2px solid var(--ink2);border-bottom:2px solid var(--ink2);transform:rotate(45deg);transition:transform .2s;flex:none;margin-left:2px}
+.salary-fold-head.open .fold-arrow{transform:rotate(-135deg)}
+.salary-fold-body{display:none;padding:0;border-top:1px solid var(--line)}
+.salary-fold-body.open{display:block}
+.table-fit{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--radius-sm);border:1px solid var(--line);background:var(--card)}
+.data-table{width:100%;border-collapse:collapse;min-width:420px;font-size:12.5px}
+.data-table th{background:#F2F3F5;font-weight:700;text-align:left;padding:9px 12px;color:#4A4650;white-space:nowrap;border-bottom:1px solid var(--line)}
+.data-table td{padding:9px 12px;border-bottom:1px solid #F2F3F5;vertical-align:top;line-height:1.5}
+.data-table tr:last-child td{border-bottom:none}
+.data-table td:first-child{font-weight:700;color:#2E2A33;white-space:nowrap}
+.salary-table{min-width:520px}
+
+/* ===== 今日打卡 ===== */
+.today-hero{
+  background:linear-gradient(135deg,var(--primary),#31435F);
+  border-radius:20px;padding:18px;color:#fff;margin-bottom:16px;
+  display:flex;align-items:center;gap:16px;position:relative;overflow:hidden;
+  box-shadow:0 12px 26px rgba(59,76,140,.28);
+}
+.today-hero::after{content:"";position:absolute;right:-30px;top:-40px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.08)}
+#today-ring{width:84px;height:84px}
+.today-hero .ring-big{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:19px;font-weight:800;
+}
+.today-stageinfo{flex:1;min-width:0}
+.stage-tag{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;border-radius:8px;padding:0 7px;color:#fff;font-weight:800;font-size:12px;margin-bottom:6px;letter-spacing:.5px}
+.today-stageinfo h3{font-size:16.5px;font-weight:800}
+.today-stageinfo p{font-size:12px;opacity:.85;margin-top:2px}
+.today-counts{display:flex;gap:14px;margin-top:8px;font-size:11.5px;opacity:.9}
+.today-done-box{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:14px 16px;margin-bottom:14px;box-shadow:var(--shadow);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.today-done-left{min-width:0}
+.today-done-left b{font-size:18px;font-weight:800;display:block}
+.today-done-left span{font-size:11.5px;color:var(--ink2)}
+.progress-track{height:7px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:8px}
+.progress-track i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),#4A7C7F);border-radius:99px;transition:width .4s}
+.btn-primary{
+  background:linear-gradient(135deg,var(--gold),#4A7C7F);color:#173B3A;
+  font-weight:800;font-size:13px;padding:11px 16px;border-radius:14px;
+  box-shadow:0 6px 16px rgba(59,108,112,.42);white-space:nowrap;
+  transition:transform .12s,box-shadow .12s;flex:none;
+}
+.btn-primary:active{transform:scale(.96)}
+.btn-primary.done{background:#E4EFEA;color:var(--ok);box-shadow:none}
+.task-date-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.task-date-head span{font-size:13px;font-weight:700;color:var(--ink2)}
+.task-date-head b{font-size:13px;font-weight:800}
+.task-group{margin-bottom:14px}
+.task-group-name{font-size:12px;font-weight:800;color:var(--ink2);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.task-group-name::before{content:"";width:14px;height:2px;border-radius:99px;background:var(--gold);flex:none}
+
+/* ===== 日历 ===== */
+.cal-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);margin-bottom:16px}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-head h3{font-size:14.5px;font-weight:800}
+.cal-nav{display:flex;gap:6px;align-items:center}
+.cal-nav button{
+  width:30px;height:30px;border-radius:9px;border:1px solid var(--line);
+  font-size:14px;color:var(--ink2);display:flex;align-items:center;justify-content:center;
+}
+.cal-nav button.cal-today-btn{width:auto;padding:0 10px;font-size:11.5px;font-weight:700;border-color:var(--gold);color:#33605F}
+.cal-week{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px}
+.cal-week span{text-align:center;font-size:11px;font-weight:700;color:var(--ink2);padding:4px 0}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-cell{
+  aspect-ratio:1;border-radius:10px;position:relative;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:600;color:#3B3644;transition:background .12s;
+  border:1px solid transparent;
+}
+.cal-cell.blank{cursor:default;border-color:transparent}
+.cal-cell:hover{background:#F2F3F5}
+.cal-cell.is-today{border-color:var(--gold);color:#33605F}
+.cal-cell.selected{background:var(--primary);color:#fff}
+.cal-cell.part{background:color-mix(in srgb,var(--ac,#1E2A3E) 12%,var(--card));border-color:color-mix(in srgb,var(--ac,#1E2A3E) 30%,var(--line))}
+.cal-cell.full{background:color-mix(in srgb,var(--ac,#1E2A3E) 22%,var(--card));border-color:color-mix(in srgb,var(--ac,#1E2A3E) 40%,var(--line))}
+.cal-num{font-size:13px;font-weight:600}
+.cal-cell.selected .cal-num{color:#fff}
+.cal-dot{
+  position:absolute;top:3px;right:3px;min-width:14px;height:14px;border-radius:99px;
+  background:var(--ac,#1E2A3E);color:#fff;font-size:9px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;padding:0 3px;
+}
+.cal-cell.selected .cal-dot{background:rgba(255,255,255,.3)}
+
+/* ===== 岗位薪资 ===== */
+.jobs-tabs{display:flex;gap:8px;margin-bottom:14px}
+.jobs-tab-btn{
+  flex:1;padding:10px 0;border-radius:12px;font-size:13px;font-weight:700;
+  background:var(--card);border:1px solid var(--line);color:var(--ink2);
+  transition:all .15s;
+}
+.jobs-tab-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);box-shadow:0 6px 14px rgba(30,42,62,.22)}
+.jobs-search{width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);font-size:13.5px;margin-bottom:14px;outline:none}
+.jobs-search:focus{border-color:var(--gold)}
+.jobs-sec{margin-bottom:20px}
+.jobs-sec-head{
+  font-size:13.5px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;
+}
+.jobs-sec-head span{font-size:11px;font-weight:600;color:var(--ink2);background:#EEEFF2;padding:2px 8px;border-radius:99px}
+.salary-intro{background:var(--gold-soft);border:1px solid #D8E4E4;border-radius:var(--radius);padding:16px;margin-bottom:18px}
+.salary-intro h4{font-size:14px;font-weight:800;color:#33525A;margin-bottom:8px}
+.salary-intro p{font-size:12.5px;color:#33525A;margin-bottom:10px}
+.salary-intro ul{padding-left:18px}
+.salary-intro li{font-size:12.5px;color:#33525A;margin-bottom:6px}
+td.sal{font-weight:700;color:#33605F;white-space:nowrap}
+
+/* ===== 我的 ===== */
+.me-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:16px}
+.me-ring-row{display:flex;align-items:center;gap:18px}
+.me-ring-box{position:relative;flex:none}
+.me-ring-box .ring-big{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:19px;font-weight:800;
+}
+.ring-big{font-size:17px;font-weight:800}
+.me-nums{flex:1;min-width:0}
+.me-num-block{margin-bottom:10px}
+.me-num-block:last-child{margin-bottom:0}
+.me-num-block b{font-size:22px;font-weight:800;display:block}
+.me-num-block span{font-size:12px;color:var(--ink2)}
+.me-summary-bar{height:7px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:10px}
+.me-summary-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--primary),#4A5E80);border-radius:99px;transition:width .4s}
+.me-sec-title{font-size:14px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.me-sec-title::before{content:"";width:4px;height:14px;border-radius:99px;background:var(--gold)}
+.remind-row{display:flex;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;align-items:flex-start}
+.remind-no{
+  width:22px;height:22px;border-radius:50%;flex:none;background:var(--gold-soft);color:#33605F;
+  font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:2px;
+}
+.remind-row p{font-size:13px;color:#35313B;line-height:1.6}
+.me-actions{display:flex;gap:10px;margin-top:18px}
+.me-action{
+  flex:1;padding:11px 0;border-radius:12px;border:1px solid var(--line);background:var(--card);
+  font-size:13px;font-weight:700;color:var(--ink2);transition:all .12s;
+}
+.me-action.danger{color:var(--danger);border-color:#EBD6D3}
+.me-action:active{transform:scale(.96)}
+.me-foot{text-align:center;font-size:11px;color:#ADB3BC;margin-top:22px}
+.data-note{font-size:11.5px;color:var(--ink2);margin-top:8px;line-height:1.7}
+
+/* ===== 职业规划 ===== */
+.career-intro{background:linear-gradient(135deg,#1E2A3E,#31435F);border-radius:var(--radius);padding:18px 20px;color:#fff;margin-bottom:18px;position:relative;overflow:hidden;box-shadow:0 10px 26px rgba(30,42,62,.22)}
+.career-intro::after{content:"";position:absolute;right:-26px;top:-34px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.08)}
+.career-hero-tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:1px;background:rgba(255,255,255,.18);padding:3px 10px;border-radius:99px;margin-bottom:8px}
+.career-intro h3{font-size:18px;font-weight:800}
+.career-intro p{font-size:12.5px;opacity:.88;margin-top:6px;line-height:1.7}
+.career-cards{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:20px}
+@media (min-width:640px){.career-cards{grid-template-columns:1fr 1fr}}
+.career-card{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--ac,#1E2A3E);border-radius:var(--radius);padding:16px;cursor:pointer;box-shadow:var(--shadow);transition:transform .15s;position:relative}
+.career-card:active{transform:scale(.985)}
+.career-card.career-quick{padding:14px 16px;display:flex;flex-direction:column;gap:2px}
+.career-card.career-quick h4{font-size:15px;margin-bottom:2px}
+.career-card.career-quick .career-tag{margin-bottom:6px}
+.career-view{display:inline-block;margin-top:8px;font-size:11.5px;font-weight:700;color:var(--ac,#1E2A3E)}
+.career-tag{display:inline-block;font-size:10.5px;font-weight:800;color:#fff;padding:2px 9px;border-radius:99px;margin-bottom:8px}
+.career-card h4{font-size:16px;font-weight:800;margin-bottom:4px}
+.career-tagline{font-size:12.5px;color:var(--ink2);margin-bottom:10px}
+.career-mini{display:flex;gap:8px;font-size:12px;line-height:1.6;margin-bottom:6px}
+.career-mini b{flex:none;width:32px;color:var(--ac,#1E2A3E);font-weight:800}
+.career-mini span{color:#3B3644}
+.career-tabs{display:flex;gap:8px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px}
+.career-tab-btn{flex:1;min-width:0;padding:9px 6px;border-radius:12px;border:1px solid var(--line);background:var(--card);font-size:12.5px;font-weight:700;color:var(--ink2);white-space:nowrap;transition:all .15s}
+.career-tab-btn.active{background:var(--ac,#1E2A3E);color:#fff;border-color:var(--ac,#1E2A3E)}
+.career-ov-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.career-ov-head b{font-size:15px;font-weight:800;color:var(--ac,#1E2A3E)}
+.career-ov-head span{font-size:11px;color:var(--ink2)}
+.career-table{min-width:480px}
+.career-table .dim-cell{background:#F6F7F8;font-weight:700;color:#4A4650;vertical-align:middle;text-align:center}
+.career-table .dim-cell em{font-style:normal;font-size:12px;white-space:nowrap}
+.ov-others{display:flex;flex-direction:column;gap:6px}
+.ov-line{display:flex;flex-direction:column;font-size:12px;line-height:1.55;border-bottom:1px dashed #ECEEF1;padding-bottom:6px}
+.ov-line:last-child{border-bottom:none;padding-bottom:0}
+.ov-line .ov-name{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:800}
+.ov-line .ov-name i{width:7px;height:7px;border-radius:50%;flex:none;display:inline-block}
+.detail-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);margin-bottom:16px}
+.detail-card h4{margin-bottom:12px}
+.career-block{margin-bottom:12px}
+.career-block:last-child{margin-bottom:0}
+.career-block-name{font-size:12.5px;font-weight:800;margin-bottom:4px}
+.career-block p{font-size:13px;color:#3B3644;line-height:1.75}
+/* 职业规划折叠块（详情拆解 / 央美建议共用） */
+.career-fold{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--card);margin-bottom:10px;overflow:hidden;box-shadow:var(--shadow)}
+.career-fold-head{width:100%;display:flex;align-items:center;gap:10px;padding:13px 14px;background:var(--card);font-size:13.5px;font-weight:800;color:#1E2A3E;text-align:left}
+.career-fold-head .fold-arrow{width:8px;height:8px;border-right:2px solid var(--ink2);border-bottom:2px solid var(--ink2);transform:rotate(45deg);transition:transform .2s;flex:none;margin-left:auto}
+.career-fold-body{display:none;padding:2px 14px 6px;border-top:1px solid var(--line)}
+.career-fold.open .career-fold-head .fold-arrow{transform:rotate(-135deg)}
+.career-fold.open .career-fold-body{display:block;padding-top:10px}
+#career-advice .advice-card{margin-bottom:10px}
+.advice-card{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:var(--shadow)}
+.advice-no{width:26px;height:26px;border-radius:50%;flex:none;background:var(--gold-soft);color:#33605F;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:2px}
+.advice-card b{display:block;font-size:14.5px;font-weight:800;margin-bottom:4px}
+.advice-tag{display:inline-block;font-size:10.5px;font-weight:700;color:var(--primary);background:var(--primary-soft);padding:2px 8px;border-radius:99px;margin-bottom:6px}
+.advice-card p{font-size:13px;color:#3B3644;line-height:1.75}
+
+/* ===== 进度分享卡 ===== */
+.share-card-wrap{padding-bottom:20px}
+.share-card{
+  background:linear-gradient(160deg,#1E2A3E 0%,#1E2A3E 55%,#31435F 100%);
+  border-radius:24px;padding:26px 22px;color:#fff;margin-bottom:14px;
+  position:relative;overflow:hidden;box-shadow:0 18px 44px rgba(30,42,62,.34);
+}
+.share-card::after{content:"";position:absolute;right:-50px;top:-60px;width:200px;height:200px;border-radius:50%;background:rgba(59,108,112,.18)}
+.share-card::before{content:"";position:absolute;left:-40px;bottom:-70px;width:170px;height:170px;border-radius:50%;background:rgba(255,255,255,.06)}
+.share-head{display:flex;align-items:center;gap:12px;position:relative;margin-bottom:22px}
+.share-logo{
+  width:44px;height:44px;border-radius:14px;flex:none;
+  background:linear-gradient(135deg,var(--gold),#4A7C7F);color:#173B3A;
+  font-weight:800;font-size:20px;display:flex;align-items:center;justify-content:center;
+}
+.share-title{font-size:16px;font-weight:800;letter-spacing:.5px}
+.share-sub{font-size:11.5px;opacity:.85;margin-top:2px}
+.share-mid{display:flex;align-items:center;gap:22px;position:relative;margin-bottom:20px}
+.share-ring-wrap{position:relative;flex:none}
+.share-ring-wrap .ring-big{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800}
+.share-nums{flex:1}
+.share-nums div{margin-bottom:10px}
+.share-nums div:last-child{margin-bottom:0}
+.share-nums b{display:block;font-size:24px;font-weight:800;line-height:1.2}
+.share-nums span{font-size:11.5px;opacity:.85}
+.share-bar{position:relative;background:rgba(255,255,255,.12);border-radius:14px;padding:12px 14px;margin-bottom:20px}
+.share-bar-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px}
+.share-bar-head b{font-size:14px}
+.share-bar .progress-track i{background:linear-gradient(90deg,var(--gold),#7FA5A0)}
+.share-foot{font-size:11px;opacity:.8;text-align:center}
+
+/* ===== 底部导航 ===== */
+.bottom-nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:760px;z-index:40;
+  background:rgba(255,255,255,.92);backdrop-filter:blur(14px);
+  border-top:1px solid var(--line);
+  display:flex;padding:8px 10px calc(10px + env(safe-area-inset-bottom));
+  gap:4px;
+}
+.tab-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:6px 0;border-radius:12px;color:var(--ink2);font-size:10.5px;font-weight:600;
+  transition:color .15s;
+}
+.tab-btn svg{width:22px;height:22px}
+.tab-btn.active{color:var(--primary);background:var(--primary-soft)}
+.tab-btn.active svg{color:var(--primary)}
+
+.empty{text-align:center;color:var(--ink2);font-size:13px;padding:30px 0}
+@media (min-width:640px){
+  body{font-size:15.5px}
+  .view{padding:20px 24px 130px}
+  .stage-card:hover{transform:translateY(-2px)}
+}
+</style>
+</head>
+<body>
+
+<!-- SECTION: header -->
+<header class="app-header">
+  <div class="header-top">
+    <div class="brand">
+      <div class="brand-logo">央</div>
+      <div>
+        <h1>央美 → 外企 · 三年之旅</h1>
+        <p>产品设计 · 雅思 · 作品集 · 求职</p>
+      </div>
+    </div>
+    <div class="header-dyn">
+      <span class="header-stage-chip" id="header-stage">Loading…</span>
+      <div class="ring-box" id="header-ring"></div>
+    </div>
+  </div>
+  <div class="header-date" id="headerDate"></div>
+</header>
+
+<!-- SECTION: views -->
+<main class="app-main">
+
+  <!-- 旅程地图 -->
+  <section class="view" id="view-timeline">
+    <div class="section-title">旅程地图 <small>点击阶段查看详情与打卡清单</small></div>
+    <div id="tl-list"></div>
+  </section>
+
+  <!-- 今日打卡 -->
+  <section class="view" id="view-today">
+    <div class="today-hero" id="today-hero">
+      <div class="ring-box" id="today-ring"></div>
+      <div class="today-stageinfo" id="today-stageinfo"></div>
+    </div>
+    <div class="today-done-box">
+      <div class="today-done-left">
+        <b id="today-done-num">0 / 0</b>
+        <span>今日任务完成度</span>
+        <div class="progress-track"><i id="today-progress-bar" style="width:0%"></i></div>
+      </div>
+      <button class="btn-primary" id="btn-finish-all" data-primary-action="complete-today">一键完成今日任务</button>
+    </div>
+    <div class="section-title">今日任务 <small>按提示逐项打卡</small></div>
+    <div id="today-tasks"></div>
+    <div class="cal-card">
+      <div class="cal-head">
+        <h3 id="cal-title"></h3>
+        <div class="cal-nav">
+          <button id="cal-prev">‹</button>
+          <button class="cal-today-btn" id="cal-today">今天</button>
+          <button id="cal-next">›</button>
+        </div>
+      </div>
+      <div class="cal-week">
+        <span>日</span><span>一</span><span>二</span><span>三</span>
+        <span>四</span><span>五</span><span>六</span>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+  </section>
+
+  <!-- 岗位与薪资 -->
+  <section class="view" id="view-jobs">
+    <div class="section-title">目标公司与薪资 <small>搜索公司或岗位</small></div>
+    <div class="jobs-tabs">
+      <button class="jobs-tab-btn active" data-jtab="target">目标岗位</button>
+      <button class="jobs-tab-btn" data-jtab="salary">薪资参考</button>
+    </div>
+    <input class="jobs-search" id="jobs-search" type="search" placeholder="搜索公司 / 岗位 / 薪资…">
+    <div id="jobs-list"></div>
+  </section>
+
+  <!-- 职业规划 -->
+  <section class="view" id="view-career">
+    <div class="section-title">职业规划 <small>管培生 vs 普通岗 · 外企 vs 私企</small></div>
+    <div class="career-intro" id="career-intro"></div>
+    <div class="section-title">四类岗位速览 <small>点击卡片进入完整对比</small></div>
+    <div class="career-cards" id="career-cards"></div>
+    <div class="section-title">完整维度对比</div>
+    <div class="career-tabs" id="career-tabs"></div>
+    <div class="career-table-wrap" id="career-overview"></div>
+    <div class="section-title">维度详细拆解</div>
+    <div id="career-details"></div>
+    <div class="section-title">央美背景下的选择建议</div>
+    <div id="career-advice"></div>
+  </section>
+
+  <!-- 我的 -->
+  <section class="view" id="view-me">
+    <div class="me-card">
+      <div class="me-ring-row">
+        <div class="me-ring-box" id="me-ring"></div>
+        <div class="me-nums">
+          <div class="me-num-block"><b id="me-total-pct">0%</b><span>累计总进度</span></div>
+          <div class="me-num-block"><b id="me-total-num">0 / 0</b><span>已完成 / 全部打卡项</span></div>
+          <div class="me-num-block"><b id="me-streak">0 天</b><span>连续打卡</span></div>
+        </div>
+      </div>
+      <div class="me-summary-bar"><i id="me-stage-bar" style="width:0%"></i></div>
+      <div style="margin-top:8px;font-size:12px;color:var(--ink2)">当前阶段 <b id="me-stage-name"></b> 进度 <b id="me-stage-pct"></b></div>
+    </div>
+    <div class="me-sec-title">关键提醒</div>
+    <div id="remind-list"></div>
+    <div class="me-actions">
+      <button class="me-action" id="btn-share">生成进度分享卡</button>
+      <button class="me-action" id="btn-export">导出打卡数据</button>
+      <button class="me-action danger" id="btn-reset">重置全部记录</button>
+    </div>
+    <p class="data-note">数据保存在当前设备浏览器（localStorage），不会上传服务器；换设备或清缓存会丢失。可随时导出备份。</p>
+    <p class="me-foot">央美 → 外企 · 三年之旅<br>用每一次打卡，靠近 Dream Offer ✦</p>
+  </section>
+</main>
+
+<!-- SECTION: bottom nav -->
+<nav class="bottom-nav">
+  <button class="tab-btn active" data-view="timeline">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    <span>旅程地图</span>
+  </button>
+  <button class="tab-btn" data-view="today">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    <span>今日打卡</span>
+  </button>
+  <button class="tab-btn" data-view="jobs">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    <span>岗位薪资</span>
+  </button>
+  <button class="tab-btn" data-view="career">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+    <span>职业规划</span>
+  </button>
+  <button class="tab-btn" data-view="me">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>我的</span>
+  </button>
+</nav>
+
+<!-- SECTION: stage detail sheet -->
+<div class="sheet" id="stage-sheet">
+  <div class="sheet-mask" id="stage-sheet-mask"></div>
+  <div class="sheet-panel">
+    <div class="sheet-head">
+      <h3>阶段详情</h3>
+      <button class="sheet-close" id="stage-sheet-close">✕</button>
+    </div>
+    <div class="sheet-scroll" id="stage-sheet-inner"></div>
+  </div>
+</div>
+
+<!-- SECTION: date detail sheet -->
+<div class="sheet" id="date-sheet">
+  <div class="sheet-mask" id="date-sheet-mask"></div>
+  <div class="sheet-panel">
+    <div class="sheet-head">
+      <h3 id="date-sheet-title"></h3>
+      <button class="sheet-close" id="date-sheet-close">✕</button>
+    </div>
+    <div class="sheet-scroll" id="date-sheet-tasks"></div>
+  </div>
+</div>
+
+<!-- SECTION: company detail sheet -->
+<div class="sheet" id="company-sheet">
+  <div class="sheet-mask" id="company-sheet-mask"></div>
+  <div class="sheet-panel">
+    <div class="sheet-head">
+      <h3 id="company-sheet-title"></h3>
+      <button class="sheet-close" id="company-sheet-close">✕</button>
+    </div>
+    <div class="sheet-scroll" id="company-sheet-inner"></div>
+  </div>
+</div>
+
+<!-- SECTION: share card sheet -->
+<div class="sheet" id="share-sheet">
+  <div class="sheet-mask" id="share-sheet-mask"></div>
+  <div class="sheet-panel">
+    <div class="sheet-head">
+      <h3>进度分享卡</h3>
+      <button class="sheet-close" id="share-sheet-close">✕</button>
+    </div>
+    <div class="sheet-scroll share-card-wrap">
+      <div class="share-card" id="share-card"></div>
+      <p class="share-tip">长按图片保存到相册，或截图转发给朋友/导师</p>
+    </div>
+  </div>
+</div>
+
+<script>
+/* SECTION: app-data — 全部内容数据（阶段/任务/公司/薪资/提醒） */
+window.APP_DATA = {
+  appTitle: "央美 → 外企 · 三年之旅",
+  appSub: "产品设计 · 雅思 · 作品集 · 外企求职 完整打卡计划",
+  todayHint: "今日打卡 · 一步步靠近 Dream Offer",
+
+  stages: [
+    {
+      id: "s0", no: 0, name: "考研冲刺期", time: "2026.10 – 2026.12",
+      end: "2026-12-25", color: "#A65D52",
+      tagline: "雅思完全暂停，全力冲刺考研初试",
+      coreTasks: [
+        "考研英语每天 3–4 小时，雅思完全暂停，不碰任何雅思材料",
+        "考研初试是当前阶段唯一不可替代的任务"
+      ],
+      daily: [
+        "早晨：考研词汇 + 长难句 45 分钟",
+        "上午/下午：考研阅读精读 + 真题 1.5–2 小时",
+        "晚上：考研写作 + 完形/翻译 45 分钟",
+        "碎片时间：英文播客泛听（不做雅思题）"
+      ],
+      weekly: [
+        "本周考研英语模考/专项是否完成",
+        "错题是否整理复盘",
+        "是否保持了雅思『零接触』状态"
+      ],
+      principles: [
+        "12 月考研前，雅思必须完全让路",
+        "如果已报名雅思且时间撞上考研冲刺期，建议改期"
+      ],
+      nodes: [
+        { text: "12 月：考研初试（当前阶段唯一核心任务），考前保持雅思『零接触』", date: "2026-12" }
+      ],
+      privateNote: "本阶段不分外企/私企，考研上岸与否不改变设计求职方向：私企设计岗同样是央美毕业生的主流去向，冲刺期无需分心关注，12 月后作品集一并覆盖两类方向即可。"
+    },
+    {
+      id: "s1", no: 1, name: "雅思诊断 + 作品集启动", time: "2026.12底 – 2027.1",
+      end: "2027-01-31", color: "#7E8A5A",
+      tagline: "考研后休整一周，摸清雅思起点，启动作品集",
+      coreTasks: [
+        "考研结束后休整一周，再进入雅思诊断和作品集启动",
+        "雅思：做一套剑桥雅思真题（剑16–18），严格计时，了解起点",
+        "作品集：整理大学期间所有作品，列出项目清单，确定 3–5 个核心项目的重做优先级",
+        "复试：如进复试，额外加 10 小时/周，作品集优先服务复试"
+      ],
+      daily: [
+        "作品集项目清单整理（每天 1–2 小时）",
+        "如有复试：复试准备（作品集英文介绍、专业问题）"
+      ],
+      weekly: [
+        "雅思诊断是否完成，起点分数记录",
+        "作品集项目清单是否确定",
+        "目标公司清单是否初步建立",
+        "英文简历初稿是否启动"
+      ],
+      nodes: [
+        { text: "雅思诊断模考（一次性，1 月内完成；剑16–18 任选一套，严格计时）" }
+      ],
+      goalNote: {
+        title: "雅思目标分设定",
+        body: "总分 6.5，阅读/听力 7.0，写作/口语 6.0–6.5。头部外企（咨询、金融、快消）建议冲 7.0。"
+      },
+      companies: [
+        { cat: "产品/工业设计", list: ["Apple","Dyson","LG Electronics","Epson","Siemens","General Motors","奇瑞捷豹路虎","BMW"] },
+        { cat: "UX/UI", list: ["SAP","Johnson Controls","Autodesk","TikTok"] },
+        { cat: "CMF", list: ["General Motors","现代汽车"] },
+        { cat: "包装设计", list: ["L'Oréal","Kenvue","Lenovo"] },
+        { cat: "设计咨询", list: ["IDEO","Accenture Song"] },
+        { cat: "时尚设计", list: ["Nike","Converse","Puma","Adidas","Bottega Veneta","LVMH"] },
+        { cat: "时尚商业", list: ["Inditex/Zara","Chanel","Tory Burch","Amer Sports"] },
+        { cat: "视觉陈列/零售空间", list: ["LVMH","Fendi","L'Oréal","历峰集团"] }
+      ],
+      privateNote: "本阶段建立目标公司清单时，私企方向可同步列入：设计与制造类私企（ZURU、明门集团、顾家家居、睿联技术、伟经等）是国内设计岗主流去向，与央美专业高度对口；作品集整理对外企、私企一视同仁，重点都是补足设计思维链条。"
+    },
+    {
+      id: "s2", no: 2, name: "雅思强化 + 作品集慢跑", time: "2027.1 – 2027.3",
+      end: "2027-03-31", color: "#47708F",
+      tagline: "雅思按 12 周三阶段推进，作品集每周固定 8–10 小时",
+      coreTasks: [
+        "雅思每天 3–4 小时，按 12 周三阶段推进",
+        "作品集每周 8–10 小时，固定时间，不拖到 5 月"
+      ],
+      dailyGroups: [
+        {
+          g: "第 1–4 周 · 基础夯实期（每日约 3 小时）",
+          items: [
+            "听力 45 分钟：剑桥真题，每天 1 个 Section 精听，逐句听写或跟读",
+            "阅读 45 分钟：每天 1 篇精读，拆解判断题、匹配题、填空题逻辑",
+            "写作 45 分钟：按话题分类积累语料，每天读 1 篇高分范文，仿写开头结尾",
+            "口语 45 分钟：按人物/地点/物品/事件梳理 Part 2 素材，每天练 2 个话题，录音回听"
+          ]
+        },
+        {
+          g: "第 5–8 周 · 分项强化期（每日约 3–4 小时）",
+          items: [
+            "听力 45 分钟：整套 Section 1–4 限时训练，重点攻克地图题和匹配题，每周 2 套完整模考",
+            "阅读 60 分钟：整套三篇限时训练，严格 20 分钟一篇，精读错题对应段落",
+            "写作 60 分钟：每周 2 篇 Task 2 + 1 篇 Task 1，对照评分标准自评 + 批改",
+            "口语 45 分钟：重点练 Part 3，按『观点—原因—举例—对比』框架，每周 1 次模拟对话"
+          ]
+        },
+        {
+          g: "第 9–12 周 · 模考查漏期（每日约 3–4 小时）",
+          items: [
+            "每周末 1 次完整模考（听力+阅读+写作+口语），严格对标考试流程",
+            "工作日针对薄弱环节专项突破",
+            "关注当季口语题库新增话题（科技伦理、AI 等）",
+            "写作限时：Task 2 35 分钟，Task 1 20 分钟"
+          ]
+        }
+      ],
+      weekly: [
+        "雅思：是否完成本周听力/阅读/写作/口语任务",
+        "作品集：是否完成本周 8–10 小时投入",
+        "英文简历：是否更新到最新版本",
+        "目标公司清单：是否根据岗位要求调整作品集方向"
+      ],
+      stageTasks: [
+        { t: "作品集慢跑", items: [
+          "重做 1–2 个核心项目：补足设计思维链条（灵感 → 调研 → 推导 → 迭代 → 成果）",
+          "每个项目突出用户调研和问题解决过程，不只展示效果图",
+          "每周固定 8–10 小时，不等待『有感觉』再做"
+        ]},
+        { t: "职业准备", items: [
+          "英文简历初稿完成：一页，量化成果，动词开头",
+          "语言能力栏：IELTS 6.5（阅读 7.0，听力 7.0）",
+          "关注实习渠道：公司官网、实习僧、牛客、LinkedIn"
+        ]}
+      ],
+      nodes: [
+        { text: "第 1–4 周：基础夯实期完成（每天 1 个 Section 精听、1 篇阅读精读、语料积累、口语素材）", date: "阶段2 · 第1–4周" },
+        { text: "第 5–8 周：分项强化期完成（整套限时训练 + 每周 2 套完整模考）", date: "阶段2 · 第5–8周" },
+        { text: "第 9–12 周：模考查漏期完成（每周末 1 次完整模考，写作限时 Task2 35 分钟 / Task1 20 分钟）", date: "阶段2 · 第9–12周" },
+        { text: "英文简历初稿完成：一页、量化成果、动词开头，附 IELTS 6.5 语言栏" }
+      ],
+      privateNote: "私企与英语并不冲突：私企设计岗同样看重作品集与实习经历，英语能力在私企外企岗位（如『出海』方向的 SHEIN、ZURU 等）也是加分项。简历初稿建议做一版中文、一版英文，私企投递用中文版即可。"
+    },
+    {
+      id: "s3", no: 3, name: "雅思出分 + 作品集加速", time: "2027.3 – 2027.4",
+      end: "2027-04-30", color: "#9A7B4B",
+      tagline: "3 月中下旬首考，5 月前出分；作品集加速定稿",
+      coreTasks: [
+        "3 月中下旬首考雅思，4 月底补考（如需），确保 5 月前出分",
+        "作品集加速精修到 4–5 个项目，做英文版",
+        "开始准备英文面试素材"
+      ],
+      nodes: [
+        { text: "3 月中下旬：首考雅思", date: "2027-03" },
+        { text: "4 月：如未达标，分析小分，4 月底补考", date: "2027-04" },
+        { text: "5 月前：确认出分", date: "2027-05" }
+      ],
+      daily: [
+        "完成 3–5 个完整项目，每个项目有清晰叙事逻辑",
+        "制作英文版 PDF，准备 2 分钟和 5 分钟英文介绍",
+        "产品/工业设计方向：突出造型、CMF、结构、量产考虑",
+        "UX/UI 方向：突出用户研究、信息架构、Figma 原型",
+        "时尚设计方向：突出材料、工艺、造型趋势、品牌叙事",
+        "英文面试素材：1–2 分钟英文自我介绍",
+        "STAR 原则准备 8–10 个故事（项目/团队/解决问题）",
+        "用英文介绍作品集的 2 分钟和 5 分钟版本",
+        "高频问题英文回答：『Why us?』『Greatest strength/weakness?』"
+      ],
+      weekly: [
+        "雅思模考是否保持每周 1 次",
+        "作品集是否按计划推进",
+        "英文面试素材是否在积累"
+      ],
+      privateNote: "作品集英文版同样适用于私企：私企出海品牌（SHEIN、ZURU、安克等）和头部私企设计岗（顾家、明门集团、睿联等）对作品集质量要求与外企一致。面试素材 STAR 故事可复用，中文版另备一套更口语化的表述。"
+    },
+    {
+      id: "s4", no: 4, name: "雅思收尾 + 实习/职业准备", time: "2027.5 – 2027.8",
+      end: "2027-08-31", color: "#6E6596",
+      tagline: "5 月前出分，5 月后集中投递；已毕业身份走替代路径",
+      coreTasks: [
+        "5 月前雅思出分，5 月后集中投递实习",
+        "由于已毕业，『在校生』身份实习机会有限，需走替代路径"
+      ],
+      stageTasks: [
+        { t: "实习申请替代方案（已毕业身份）", items: [
+          "合同工/自由职业：通过 LinkedIn、Upwork、设计外包社区寻找外企短期合作",
+          "远程实习/项目制：关注 Atlassian 等提供远程产品设计实习的公司",
+          "设计竞赛/开源项目：参加 iF、Red Dot 等国际竞赛，参与开源设计项目",
+          "央美资源：联系央美就业指导中心或导师争取内推或校企合作（央美与奥美、福特中国设计中心有合作）"
+        ]},
+        { t: "投递渠道", items: [
+          "公司官网招聘页",
+          "实习僧、牛客、LinkedIn",
+          "学校就业中心、校友内推",
+          "央美就业指导中心（校企合作项目）"
+        ]}
+      ],
+      weekly: [
+        "本周投递了多少家（建议同时投 10–15 家）",
+        "是否覆盖 2–3 个方向，不只盯最头部",
+        "英文简历是否根据岗位微调",
+        "面试准备是否在推进"
+      ],
+      nodes: [
+        { text: "5 月前：雅思确认出分", date: "2027-05 前" },
+        { text: "5 月后：开始集中投递（每周 10–15 家）", date: "2027-05 起" }
+      ],
+      companies: [
+        { cat: "产品/工业设计", rows: [
+          ["Apple","Packaging Product Design Intern","机械工程/包装科学学位，3D/2D CAD 能力"],
+          ["Dyson","工业设计师","工业设计/产品设计学位"],
+          ["LG Electronics","产品设计师","设计相关学位，iF 设计奖团队"],
+          ["Epson","产品设计师","设计相关，Red Dot 获奖团队"],
+          ["Siemens","产品/工业设计实习生","医疗器械方向，工业设计背景"],
+          ["General Motors","CMF/品牌设计师","工业设计学位，交通工具设计方向"],
+          ["奇瑞捷豹路虎","工业设计/造型设计","本科工业设计，研究生工业设计工程，2025/2026 届"],
+          ["BMW","HMI Concept Designer","人机交互/工业设计/UX 学位，流利英语，Axure/Sketch/Figma"],
+          ["TikTok","AI 产品设计师","2027 届本科及以上，人机交互/AI/设计专业，Figma，熟悉移动端规范"],
+          ["TikTok","C 端产品设计师","2027 届，专业不限，人机交互/交互设计优先"],
+          ["DoorDash","Product Design Entry-Level","设计或技术相关学位，2027 年夏季毕业，Figma + AI 工具"],
+          ["Figma","Early Career Product Designer","视觉设计/交互设计，原型能力，设计系统兴趣"]
+        ]},
+        { cat: "UX/UI 设计", rows: [
+          ["SAP","UX 设计实习生","工业设计专业，良好英语沟通"],
+          ["Johnson Controls","ID/UX 设计师","工业设计（CMF）+ 用户体验（UX）"],
+          ["Autodesk","体验设计师","建筑与工程软件用户体验"]
+        ]},
+        { cat: "CMF 设计", rows: [
+          ["General Motors","CMF 与品牌设计师","工业设计学位"],
+          ["现代汽车","UX Studio","概念到量产用户体验"]
+        ]},
+        { cat: "包装设计", rows: [
+          ["L'Oréal","高级包装经理","与研发/运营/营销团队合作"],
+          ["Kenvue","包装工程师","包装开发与验证"],
+          ["Lenovo","包装设计师","—"]
+        ]},
+        { cat: "设计咨询", rows: [
+          ["IDEO","北京/上海工作室","设计专业学生理想殿堂"],
+          ["Accenture Song","数字产品设计师","信息架构/用户测试"],
+          ["Gensler","产品设计师","为建筑环境设计家具/灯具"],
+          ["Aedas","国际建筑设计事务所","产品实践部门"]
+        ]},
+        { cat: "时尚设计", rows: [
+          ["Nike","配饰创新设计高级设计师","产品设计/工业设计学位，材料探索 + 快速原型"],
+          ["Converse","鞋履产品设计师","与设计/产品管理/开发团队协作，材料 + 细节融合"],
+          ["Puma","服装/鞋履设计师","为关键客户和零售渠道设计开发产品线"],
+          ["Adidas","童鞋高级设计师","跑步鞋品类，推动创意文化 + 产品故事"],
+          ["Bottega Veneta","初级物件设计师","产品设计/建筑学位，米兰"],
+          ["LVMH","产品开发（礼品配饰）","工业设计或工程学位"]
+        ]},
+        { cat: "时尚商业 / 前线", rows: [
+          ["Inditex/Zara","门店陈列管培生","应届/1 年内，专业不限，服装设计/艺术设计/时尚管理优先，良好中英文，销售数据分析"],
+          ["Inditex/Zara","门店运营管培生","应届/1 年内，对库存管理感兴趣，中英文书写表达"],
+          ["Inditex/Zara","门店顾客体验管培生","应届毕业生，顾客导向"],
+          ["优衣库","UMC 经营管理培训生","专业不限，CET4≥425 或 IELTS≥5.0，接受全国调动，80 小时店铺实践"],
+          ["Chanel","时尚高级商品企划经理","将创意愿景转化为中国市场商品策略"],
+          ["Tory Burch","高级商品企划","市场洞察 + 时尚趋势理解，本地化商品组合"],
+          ["Amer Sports","商品企划管培生","市场洞察延伸至商品策略，产品驱动品牌增长"],
+          ["LVMH","高级店铺视觉指导专员","精通所有产品品类，视觉陈列驱动销售"],
+          ["Fendi","中国区视觉陈列经理","时尚/设计/艺术学位，10 年以上 VM/零售经验"],
+          ["L'Oréal","零售设计经理","设计学位硬性要求，顶尖设计院校优先，精品店/柜台/快闪店空间设计"],
+          ["历峰集团","店铺设计规划助理实习生","建筑或室内设计背景，零售店铺规划"],
+          ["LVMH","建筑团队实习生","建筑或室内设计学位，AutoCAD，零售项目设计"]
+        ]},
+        { cat: "泛设计 / 解决方案", rows: [
+          ["Canva","设计解决方案顾问","服务品牌和营销团队"],
+          ["SAP/Siemens","售前顾问","理解客户研发/设计/制造流程"],
+          ["Stripe/Payoneer/JetBrains","客户成功经理","—"]
+        ]}
+      ],
+      privateNote: "已毕业身份投私企不受『在校生』限制，反而更顺：私企设计岗对往届/毕业即入职更友好。替代路径同样适用——合同工、外包设计、私企远程实习、设计竞赛（iF/Red Dot 获奖私企同样认可）。投递可外企、私企并行，每周 10–15 家可分两批：外企走官网+LinkedIn，私企走实习僧、牛客、BOSS 直聘。",
+      privateCompanies: [
+        { cat: "产品/工业设计（私企）", rows: [
+          ["ZURU","初级产品设计师/包装设计师/插画师","10–15K/月，深圳，本科及以上"],
+          ["ZURU","初级 3D 设计师","7–12K/月，深圳"],
+          ["明门集团","产品研发设计师","月薪 9–11K/+，东莞，CET-4"],
+          ["顾家家居","产品/结构设计","本科年薪≥13 万"],
+          ["睿联技术","工业设计","13–18 万/年"],
+          ["广东伟经","工业设计","7–9.5K/月"]
+        ]},
+        { cat: "时尚/零售（私企）", rows: [
+          ["SHEIN","买手（2027 届）","10.5–15K/月，广州，服装设计相关专业"],
+          ["宝姿","设计/时尚类校招","7K 底薪 + 提成"],
+          ["斐乐 FILA","零售管培（设计方向）","一线 8K/月起，需走终端实训路径"],
+          ["亚玛芬体育","服装设计管培生","12–15K/月，上海"]
+        ]},
+        { cat: "包装/CMF（私企）", rows: [
+          ["安姆科","2027 届『未来人才计划』","实习 2,500/月 + 餐宿，转正 6–7K/月"],
+          ["延锋","CMF 设计师","约 10K/月起，汽车座椅/内饰"],
+          ["博西华电器","CMF 与结构设计战略实习生","南京，2027 届，实习≥4 个月"]
+        ]}
+      ]
+    },
+    {
+      id: "s5", no: 5, name: "研究生阶段", time: "2027.9 起",
+      end: "2030-06-30", color: "#3D7777",
+      tagline: "寒暑假实习 + 商业比赛 + 证书 + 英语维持（若上岸）",
+      coreTasks: [
+        "寒暑假各一段实习，最好有一段头部外企",
+        "参加商业比赛、案例分析大赛",
+        "根据方向考证书：CPA、CFA、ACCA、FRM",
+        "维持英语：雅思若过期（2029 年 5 月），毕业前一年重考一次"
+      ],
+      stageTasks: [
+        { t: "雅思有效期提醒", items: [
+          "2027 年 5 月出分，2029 年 5 月过期",
+          "2 年制硕士 2029 年 6 月毕业，2028 年秋招时成绩有效",
+          "3 年制硕士 2030 年毕业，2029 年秋招时雅思已过期，需重考一次"
+        ]},
+        { t: "实习要求（在校生身份恢复后）", items: [
+          "暑期实习网申：年初 2–4 月启动，面试 4–5 月，7 月入职",
+          "日常实习全年滚动招聘",
+          "重点目标：欧莱雅暑期实习生（要求在校生）、雅诗兰黛暑期实习生（毕业时间窗口限制）、德意志银行实习（毕业时间明确要求）"
+        ]}
+      ],
+      weekly: [
+        "是否保持了行业阅读习惯",
+        "寒暑假实习是否按计划推进",
+        "雅思有效期是否临近，是否需要重考",
+        "作品集是否持续更新"
+      ],
+      privateNote: "研一/研二假期实习可外企私企并行：私企暑期实习（TikTok、小米、蔚来等互联网与新消费公司）门槛相对低、反馈快，是攒作品与面试故事的高效途径；商业比赛、案例大赛（私企赞助的尤佳）能同时积累简历素材。证书方面，若日后想去金融/咨询类私企，CPA/CFA 才有意义，设计方向以作品与实习为先。"
+    },
+    {
+      id: "s6", no: 6, name: "毕业前一年 · 外企秋招", time: "毕业前一年",
+      end: "2030-11-30", color: "#8E5B7E",
+      tagline: "提前批 7–8 月，正式秋招 8–11 月，春招补录 2–4 月",
+      coreTasks: [
+        "外企校招节奏：提前批 7–8 月，正式秋招 8–11 月，春招补录次年 2–4 月",
+        "如未上岸，2027 年 5 月后直接找实习，参加 2027 年秋招，路径同样通"
+      ],
+      daily: [
+        "英文自我介绍 1–2 分钟（反复练习到自然）",
+        "行为面试：STAR 原则，准备 8–10 个故事",
+        "案例面试：咨询和四大需要练",
+        "英文群面：快消和四大常见",
+        "行业知识：读目标公司财报、新闻、行业报告",
+        "作品集英文讲解：2 分钟版 + 5 分钟版"
+      ],
+      weekly: [
+        "是否投递了目标公司",
+        "面试准备是否在推进",
+        "行业知识积累是否在持续"
+      ],
+      stageTasks: [
+        { t: "雅思有效期管理", items: [
+          "2027 年 5 月出分，2029 年 5 月过期",
+          "建议毕业前一年秋招前再考一次，目标 7.0，或至少保持 6.5 有效"
+        ]}
+      ],
+      nodes: [
+        { text: "提前批网申（7–8 月）", date: "7–8 月" },
+        { text: "正式秋招集中网申与面试（8–11 月）", date: "8–11 月" },
+        { text: "春招补录（次年 2–4 月）", date: "2–4 月" }
+      ],
+      privateNote: "毕业前一年秋招不必只盯外企：私企秋招周期基本与外企同步（提前批 7–8 月、正式批 8–11 月、春招补录 2–4 月），可以双线投递降低风险。私企设计岗（TikTok/小米/蔚来、SHEIN/ZURU、顾家/明门等）薪资中上、成长快，也是央美背景的优质去向；『先入私企头部拿高薪、积累 3–5 年再跳外企更高职级』是一条完全可行的路线（详见『职业规划』页）。雅思对私企同样加分，不强求但简历更好看。",
+      privateCompanies: [
+        { cat: "互联网/科技（私企）", rows: [
+          ["TikTok 字节跳动","AI 产品设计师 / 产品设计师","2027 届，Figma，移动端规范"],
+          ["小米","产品/包装设计师","杭州/北京，需作品集"],
+          ["蔚来","体验设计师","上海，汽车/智能硬件方向"]
+        ]},
+        { cat: "快时尚/零售（私企）", rows: [
+          ["SHEIN","买手 / 视觉设计（2027 届）","10.5–15K/月，广州"],
+          ["斐乐 FILA","零售管培（设计方向）","一线 8K/月起"],
+          ["宝姿","设计/时尚类校招","7K 底薪 + 提成"]
+        ]},
+        { cat: "制造/家居（私企）", rows: [
+          ["ZURU","产品/包装/插画设计","10–15K/月，深圳"],
+          ["明门集团","产品研发设计师","月薪 9–11K+，东莞"],
+          ["顾家家居","产品/结构设计","本科年薪≥13 万"]
+        ]}
+      ]
+    }
+  ],
+
+  reminders: [
+    "考研前不要碰雅思，12 月前雅思完全暂停",
+    "雅思 6.5 够用，头部外企可能 7.0：先按 6.5 准备，出分后根据目标公司决定是否刷分",
+    "雅思有效期 2 年：2027 年 5 月出分，2029 年 5 月过期，3 年制硕士校招前需重考",
+    "实习不要等雅思完全考完才了解，1–4 月可顺手准备英文简历、关注渠道",
+    "外企求职核心是『能用英语工作』：实习中的英文邮件、会议、汇报比多 0.5 分更有说服力",
+    "如果考研未上岸，路径依然通：2027 年 5 月后找实习，参加秋招，毕业进外企",
+    "已毕业身份找实习受限，替代路径：合同工/自由职业、远程实习、设计竞赛、央美内推",
+    "作品集可以慢慢准备，但不能慢慢开始：12 月启动，每周 8–10 小时，5 月定稿",
+    "央美背景的独特优势：审美训练 + 视觉叙事能力，面试中突出『用设计讲故事』",
+    "前线岗位转型可行：解决方案顾问、客户成功经理、商品企划、视觉陈列，设计背景是稀缺优势"
+  ],
+
+  salaryIntro: {
+    title: "薪资参考（2027 届校招/应届税前）",
+    body: "数据来源于 2027 届校园招聘公告及行业薪资平台。国内岗位以人民币月薪为主，海外岗位标注当地货币年薪；部分外企保密（如 Dyson 标注 Competitive）仅列可获取数据。实际薪资受城市、学历、经验、岗位级别影响。",
+    notes: [
+      "国内应届设计岗主流：产品/工业设计约 7–15K/月，UX/UI 约 7–15K/月，商品企划/买手约 10–15K/月，零售管培约 8–15K/月。央美背景 + 雅思 6.5 + 优质作品集，有机会争取区间中上段",
+      "海外岗位薪资显著高于国内（美国科技公司 UX/产品设计应届 $76K–155K；英国 Graduate Programme £33K–105K），但通常要求工作签证或当地学历，需单独评估可行性",
+      "外企薪资结构：基本月薪外通常含 13 薪、绩效奖金、年度调薪、股票/期权（科技）、员工折扣（时尚/零售）、补充医疗保险等；优衣库 UMC 每年 2 次额外奖金 + 1 次年度利润分享",
+      "实习薪资主要用于评估转正后薪资范围与生活成本匹配度；目标城市生活成本高（上海、深圳）时优先选提供餐补、住宿或交通补贴的项目"
+    ]
+  },
+
+  salary: [
+    { cat: "一、产品/工业设计类", rows: [
+      ["ZURU","初级产品设计师/包装设计师/插画师","10–15K/月","深圳，本科及以上，设计类专业"],
+      ["ZURU","初级 3D 设计师","7–12K/月","深圳，大专及以上，工业设计/产品设计等"],
+      ["明门集团","产品研发设计师","月薪 9–11K，年薪 12.5–16.5 万","东莞，本科，机械/材料/力学类，CET-4"],
+      ["工业设计工程师（外企）","2027 应届生","10 万元/年","南京，本科及以上，产品设计相关，需作品集"],
+      ["MillerKnoll","Junior Industrial/Product Designer","£33K–66K/年（约 30–60 万人民币）","伦敦，产品设计/工业设计学位"],
+      ["Apple","Product Design Intern","CNY 600K–800K/年","深圳，实习岗，折算约 50–67K/月"],
+      ["Apple","Product Design Engineer Intern","CNY 3.1 万–4.9 万/年（估算）","深圳，实习岗，约 2,600–4,100/月"],
+      ["Dyson","Industrial Designer / CMF Designer","Competitive（未公开）","深圳，产品设计/工业设计学位"],
+      ["Dyson","Lead Design Engineer","30–40K/月","深圳，3–5 年经验，非应届参考"]
+    ]},
+    { cat: "二、UX/UI 设计类", rows: [
+      ["凯捷咨询","UIUX 设计","7–10K/月","上海，本科，设计相关专业，实习后转正"],
+      ["IBM","Entry Level UX Designer","约 S$9,665/月（新加坡，估算）","Austin, TX，2027 届"],
+      ["IBM","Entry Level Product Experience Designer","$73,602/年（德州中位数）","Austin, TX"],
+      ["TikTok","AI Product Designer Graduate","$76,000–151,200/年","San Jose, CA，2027 Start"],
+      ["Palantir","Product Designer, New Grad","$130,000–135,000/年 + RSU + Sign-on","纽约，2027 届"],
+      ["Palantir","Product Designer, New Grad","£85K–86K/年（约 78–79 万人民币）","伦敦"],
+      ["DoorDash","Product Designer New Grad","$105.4K–155K/年","2027 届"],
+      ["Revolut","Graduate Product Designer","£76K–105K/年（约 70–96 万人民币）","伦敦，Graduate Programme 2027"]
+    ]},
+    { cat: "三、CMF 设计类", rows: [
+      ["Tesla","CMF Design Intern","$20–50/小时","Hawthorne, CA, Winter/Spring 2027"],
+      ["延锋","CMF 设计师","约 10K/月起","2027 届，汽车座椅/内饰方向"],
+      ["博西华电器","CMF 与结构设计战略实习生","未公开","南京，2027 届，实习时长≥4 个月"]
+    ]},
+    { cat: "四、包装设计类", rows: [
+      ["ZURU","初级包装设计师","10–15K/月","深圳，本科及以上"],
+      ["安姆科","2027 届『未来人才计划』实习生","实习补贴 2,500/月 + 免费用餐/宿舍","转正后约 6–7K/月"],
+      ["LVMH","Packaging Design Assistant","€1,300–1,400/月","2027 年 1–7 月，创意工作室角色"],
+      ["P&G","Design Co-op Summer 2027","$29–50/小时","Cincinnati, OH"],
+      ["Haleon","Packaging Development Designer","£28,860/年（约 26 万人民币）","英国 Weybridge, Industrial Placement 2027"],
+      ["Philips","Packaging Engineer Co-op","$26–29/小时 + 加班费","Winter 2027"],
+      ["迪士尼商店","Product Design Creative Intern","6K/月","上海，实习岗"]
+    ]},
+    { cat: "五、时尚设计类", rows: [
+      ["亚玛芬体育","服装设计管培生","12–15K/月","上海，2027 届管培生"],
+      ["宝姿","设计/时尚类校招","7K 底薪 + 提成","服装设计/时尚传播等专业优先"],
+      ["Primark","Trainee Designer – Placement","€30,000/年（约 23 万人民币）","2027 夏季开始，12 个月培养项目"],
+      ["斐乐 FILA","零售管培（设计方向）","一线本科 8K/月；新一线 7.5K/月；其他 7K/月","需经历终端实训→储备店长→职能专员路径"]
+    ]},
+    { cat: "六、商品企划/买手类", rows: [
+      ["亚玛芬体育","商品企划管培生（萨洛蒙）","10–12K/月","杭州，2027 届"],
+      ["SHEIN","买手（2027 届）","10.5–15K/月","广州，本科及以上，服装设计相关专业"],
+      ["Macy's","Executive Development Program – Merchandising & Buying","$54,600–90,960/年","纽约，2027 届"],
+      ["TJX","Merchandising & Buying Development Programme","£38K–52K/年（约 35–48 万人民币）","英国 Watford，2027 届"]
+    ]},
+    { cat: "七、视觉陈列/零售空间类", rows: [
+      ["耐克","VM 陈列员（旗舰店）","7–9K × 13 薪","可接受设计/服装专业应届生"],
+      ["H&M","Online Visual Merchandiser","15–20K/月","上海静安区，应届本科"],
+      ["Dior","Visual Merchandising Intern","£40,500–49,500/年（估算，约 37–45 万人民币）","英国，实习岗"],
+      ["L'Oréal","Visual Merchandising Apprentice","£26,950/年（约 25 万人民币）","2027 年 1 月入职，4 天办公室 + 1 天大学"],
+      ["LVMH","零售精英管培生","5–8K/月","应届和往届均可，2026 年 6 月前可全职投入"],
+      ["LVMH Fashion Group","RET 零售精英管培","7.5–10K/月","北京，20 人，本科"],
+      ["LVMH","3D & 2D Design Intern – VM","$20/小时","纽约"],
+      ["Primark","Visual Merchandising Manager","£44,156/年（约 40 万人民币）","伦敦，含 31 天年假 + 养老金"],
+      ["LVMH（Loewe）","设计/创意类初级岗（DA junior 等）","€35,000–65,000/年（约 27–50 万人民币）","法国，视知名度和经验而定"]
+    ]},
+    { cat: "八、零售管培生类", rows: [
+      ["优衣库","UMC 经营管理培训生","税前月薪 11,200–14,800 元","全国调动，每年 2 次奖金 + 1 次利润分享，CET4≥425 或 IELTS≥5.0"],
+      ["Inditex/Zara","门店陈列/运营/顾客体验管培生","未公开","专业不限，服装设计/艺术设计/时尚管理优先，良好中英文"]
+    ]},
+    { cat: "九、客户成功/解决方案顾问类", rows: [
+      ["Appian","Associate Solutions Consultant","$95,000/年","McLean, VA，2027 届"],
+      ["Gartner","Client Success Associate","$53,000–77,000/年","Irving, TX，2026 & 2027 届"],
+      ["Google","Customer Growth Associate","$72,000–102,000/年 + 30% 奖金目标 + 股权","2027 Start"],
+      ["Oracle NetSuite","Customer Success Associate Consultant","$24.62–50.43/小时","2027 年 1 月入职"]
+    ]},
+    { cat: "十、实习薪资参考（国内/海外）", rows: [
+      ["安姆科","2027 届实习生","2,500/月 + 免费用餐/宿舍","—"],
+      ["迪士尼商店","Product Design Creative Intern","6,000/月","—"],
+      ["Apple","Product Design Engineer Intern","约 2,600–4,100/月","—"],
+      ["博西华电器","CMF 与结构设计战略实习生","未公开","—"],
+      ["LVMH","Packaging Design Assistant","€1,300–1,400/月","—"],
+      ["Tesla","CMF Design Intern","$20–50/小时","—"],
+      ["P&G","Design Co-op","$29–50/小时","—"],
+      ["Philips","Packaging Engineer Co-op","$26–29/小时","—"]
+    ]}
+  ],
+  companyLib: {
+    "Apple": { intro: "美国科技公司，以 iPhone、Mac、iPad 等消费电子产品和设计闻名，设有产品设计、包装设计、零售体验等多个设计方向岗位。", path: ["设计实习 / 初级设计师","产品设计师","高级产品设计师","设计负责人（经理 / 总监）"] },
+    "Dyson": { intro: "英国科技公司，以无叶风扇、吸尘器、吹风机等创新家电著称，设计团队覆盖工业设计、CMF、结构设计。", path: ["初级工业设计师","工业设计师","高级设计师","设计经理 / 首席设计师"] },
+    "LG Electronics": { intro: "韩国电子巨头，业务涵盖家电、显示、汽车零部件等，拥有屡获 iF、红点奖的设计团队。", path: ["初级设计师","产品设计师","高级设计师","设计经理","设计总监"] },
+    "Epson": { intro: "日本精工爱普生，主营打印机、投影仪、机器人等，设计团队多次获红点奖。", path: ["初级设计师","产品设计师","高级设计师","设计主管"] },
+    "Siemens": { intro: "德国工业巨头，涉及工业、能源、医疗等领域，医疗器械与工业设计岗位分布在全球研发中心。", path: ["设计实习生","产品 / 工业设计师","高级设计师","设计团队负责人"] },
+    "General Motors": { intro: "美国通用汽车，全球性汽车制造商，设计中心覆盖外观造型、内饰、CMF 及品牌设计。", path: ["造型 / CMF 设计师","资深设计师","设计主管","设计总监"] },
+    "奇瑞捷豹路虎": { intro: "奇瑞与捷豹路虎的合资车企，常熟工厂，招聘造型设计与工业设计工程方向人才。", path: ["造型设计师 / 工程师","资深造型设计师","造型科长 / 主管","设计负责人"] },
+    "BMW": { intro: "德国宝马集团，豪华汽车制造商，设计部门覆盖整车造型、HMI 交互与数字体验。", path: ["设计实习生","设计师（造型 / HMI）","高级设计师","设计团队负责人"] },
+    "SAP": { intro: "德国软件公司，全球领先的企业管理软件（ERP）厂商，UX 设计团队负责企业级产品体验。", path: ["UX 设计实习生","UX / 产品设计师","高级 UX 设计师","设计负责人"] },
+    "Johnson Controls": { intro: "美国江森自控，楼宇科技与智慧建筑解决方案商，设有工业设计（含 CMF）与用户体验岗位。", path: ["ID / UX 设计师","高级设计师","设计主管","设计经理"] },
+    "Autodesk": { intro: "美国软件公司，AutoCAD、Fusion 360 等设计工具的开发商，体验设计师服务建筑与工程软件。", path: ["体验设计师","高级体验设计师","设计负责人"] },
+    "TikTok": { intro: "字节跳动旗下短视频平台，全球用户规模大，产品设计团队负责移动端与 AI 产品体验。", path: ["产品设计师","高级产品设计师","设计组长","设计负责人"] },
+    "现代汽车": { intro: "韩国现代汽车，全球车企，设有 UX Studio，重视概念到量产的用户体验。", path: ["UX / CMF 设计师","资深设计师","设计主管","设计负责人"] },
+    "L'Oréal": { intro: "法国欧莱雅集团，全球最大化妆品公司，旗下兰蔻、赫莲娜、理肤泉等品牌，提供包装、零售设计、视觉陈列等岗位。", path: ["初级专员 / 设计师","专员 / 设计师","高级专员 / 经理","部门负责人"] },
+    "Kenvue": { intro: "强生消费者健康业务分拆后的公司，旗下邦迪、露得清、城野医生等品牌，设有包装开发与验证岗位。", path: ["包装工程师","高级包装工程师","包装经理","包装负责人"] },
+    "Lenovo": { intro: "联想集团，全球领先的 PC 厂商，包装设计团队负责产品包装与可持续设计。", path: ["包装设计师","高级设计师","设计主管"] },
+    "IDEO": { intro: "全球知名设计咨询公司，以设计思维和人本设计著称，北京 / 上海设有工作室，项目覆盖产品、服务与体验。", path: ["设计师 / 研究员","高级设计师","项目负责人","设计总监"] },
+    "Accenture Song": { intro: "埃森哲旗下创意与体验设计部门，全球规模大，提供数字产品、品牌与服务设计咨询。", path: ["数字产品设计师","高级设计师","设计经理","设计总监"] },
+    "Gensler": { intro: "全球最大的建筑与设计事务所之一，业务含商业建筑、室内与产品设计（为建筑环境设计家具与灯具）。", path: ["产品设计师","高级设计师","设计主管","设计负责人"] },
+    "Aedas": { intro: "国际建筑设计事务所，业务覆盖亚洲多地，设计范围含建筑、室内与产品实践部门。", path: ["设计师","高级设计师","项目经理 / 设计主管","设计负责人"] },
+    "Nike": { intro: "美国运动品牌巨头，设计部门覆盖鞋类、服装、配件，强调材料探索与快速原型。", path: ["设计实习 / 初级设计师","设计师","高级设计师","设计总监"] },
+    "耐克": { intro: "美国运动品牌巨头，旗舰店视觉陈列岗位负责门店陈列与品牌体验呈现。", path: ["VM 陈列员","高级 VM / 陈列主管","区域 VM 负责人","VM 经理"] },
+    "Converse": { intro: "Nike 旗下鞋类品牌（匡威），鞋履设计团队注重材料、细节与运动文化。", path: ["初级鞋类设计师","设计师","高级设计师","设计主管"] },
+    "Puma": { intro: "德国运动品牌，覆盖服装、鞋履与配件，设计团队服务多个产品线。", path: ["设计师","高级设计师","设计主管","设计总监"] },
+    "Adidas": { intro: "德国运动品牌巨头，跑步、足球等品类产品线丰富，设计团队强调整体创意文化与产品故事。", path: ["设计师","高级设计师","品类设计负责人 / 设计总监"] },
+    "Bottega Veneta": { intro: "意大利奢侈皮具品牌（开云集团旗下），米兰设有时尚与物件设计岗位。", path: ["初级设计师","设计师","高级设计师","设计负责人"] },
+    "LVMH": { intro: "法国奢侈品集团，旗下 Louis Vuitton、Dior、Fendi、Loewe 等品牌众多，招聘涵盖产品开发、视觉陈列、零售管培生等。", path: ["初级专员 / 实习生","专员 / 设计师","高级专员 / 经理","品牌 / 部门负责人"] },
+    "Inditex": { intro: "西班牙快时尚集团，Zara 母公司，旗下 Bershka、Pull&Bear、Massimo Dutti 等品牌，门店管培生体系成熟。", path: ["门店管培生","店长 / 陈列主管","区域经理","大区负责人"] },
+    "Chanel": { intro: "法国奢侈品牌香奈儿，时装、手袋、香水等品类，商品企划团队负责将创意愿景转化为商品策略。", path: ["商品企划专员","高级企划","企划经理","商品总监"] },
+    "Tory Burch": { intro: "美国轻奢品牌，商品企划团队结合市场洞察与时尚趋势做本地化商品组合。", path: ["商品企划助理","企划专员","高级企划","企划经理"] },
+    "Amer Sports": { intro: "芬兰亚玛芬体育，旗下萨洛蒙、始祖鸟、Wilson 等品牌，服装设计与商品企划管培生岗位集中在上海 / 杭州。", path: ["管培生","设计师 / 企划专员","高级专员","部门负责人"] },
+    "Fendi": { intro: "意大利奢侈品牌（LVMH 旗下），视觉陈列（VM）岗位负责门店陈列与品牌形象。", path: ["VM 专员","高级 VM","VM 经理","VM 总监"] },
+    "历峰集团": { intro: "瑞士奢侈品集团，旗下卡地亚、梵克雅宝、Chloé 等品牌，设有店铺设计与零售空间规划岗位。", path: ["店铺设计助理","空间设计师","高级设计师","设计经理"] },
+    "DoorDash": { intro: "美国外卖配送平台，产品设计团队负责端到端配送体验，新毕业生岗位面向 2027 届。", path: ["初级产品设计师","产品设计师","高级设计师","设计负责人"] },
+    "Figma": { intro: "美国设计协作软件公司，Figma / FigJam 的开发商，早期职业设计师岗位面向应届生。", path: ["初级产品设计师","产品设计师","高级设计师","设计负责人"] },
+    "优衣库": { intro: "日本快时尚品牌（迅销集团），UMC 经营管理培训生体系主打全国门店管理与经营人才培养。", path: ["UMC 管培生","店长","区域经理 / 职能岗","更高管理职位"] },
+    "Canva": { intro: "澳大利亚设计平台公司，面向品牌与营销团队提供设计解决方案。", path: ["解决方案顾问","高级顾问","团队负责人"] },
+    "Stripe": { intro: "美国在线支付公司，设有客户成功与解决方案相关岗位。", path: ["客户成功 / 支持专员","高级专员","客成经理"] },
+    "Payoneer": { intro: "美国跨境支付公司，服务跨境电商卖家，设有客户成功岗位。", path: ["客户成功专员","高级专员","团队负责人"] },
+    "JetBrains": { intro: "捷克软件工具公司，IDE（IntelliJ、PyCharm 等）开发商，设有客户成功与服务岗位。", path: ["客户成功专员","高级专员","团队负责人"] },
+    "ZURU": { intro: "新西兰玩具与快消公司，深圳设有设计中心，招聘产品设计、包装设计与插画岗位。", path: ["初级设计师","设计师","高级设计师","设计主管"] },
+    "明门集团": { intro: "台湾母婴用品制造商（Wonderland），东莞厂区招聘产品研发设计师，涉及机械 / 材料方向。", path: ["研发设计师","高级设计师","研发主管","部门负责人"] },
+    "MillerKnoll": { intro: "美国办公家具集团（Herman Miller 与 Knoll 合并），伦敦设有工业 / 产品设计岗位。", path: ["初级设计师","设计师","高级设计师","设计经理"] },
+    "凯捷咨询": { intro: "法国 IT 咨询公司，上海交付中心招聘 UI/UX 设计，多走实习转正路径。", path: ["UI/UX 设计实习生","UI/UX 设计师","高级设计师","设计负责人"] },
+    "IBM": { intro: "美国科技公司，业务覆盖软件、咨询与设计（IBM Design 与 iX），设有入门级体验设计岗位。", path: ["初级体验设计师","体验设计师","高级设计师","设计负责人"] },
+    "Palantir": { intro: "美国数据软件公司，产品设计团队服务政府与企业客户，北美 / 伦敦均有新毕业生岗位。", path: ["初级产品设计师","产品设计师","高级设计师","设计负责人"] },
+    "Revolut": { intro: "英国金融科技公司，全球用户规模大，Graduate 产品设计项目面向应届生。", path: ["Graduate 产品设计师","产品设计师","高级设计师","设计负责人"] },
+    "Tesla": { intro: "美国电动车公司，设计与工程团队覆盖整车造型、内饰与 CMF。", path: ["CMF 实习 / 助理","CMF 设计师","高级设计师","设计负责人"] },
+    "延锋": { intro: "中国汽车内饰供应商，招聘 CMF 设计师，覆盖汽车座椅、内饰方向。", path: ["CMF 设计师","高级 CMF 设计师","设计主管"] },
+    "博西华电器": { intro: "博西家电中国工厂，家电制造商，招聘 CMF 与结构设计战略实习生。", path: ["设计实习生","CMF / 结构设计师","高级设计师","设计主管"] },
+    "安姆科": { intro: "全球包装企业，2027 届『未来人才计划』面向包装工程与设计方向。", path: ["人才计划培训生","包装工程师","高级工程师","部门负责人"] },
+    "P&G": { intro: "宝洁，美国快消巨头，旗下帮宝适、海飞丝、SK-II 等品牌，Design Co-op 项目面向暑期实习。", path: ["设计 Co-op","设计师","高级设计师","设计经理 / 总监"] },
+    "Haleon": { intro: "英国消费者健康公司（GSK 分拆），旗下舒适达、钙尔奇等，包装设计岗位设于英国总部。", path: ["Placement 设计师","包装设计师","高级设计师","设计负责人"] },
+    "Philips": { intro: "荷兰飞利浦，健康科技公司，产品含医疗设备与家用电器，包装工程师岗位有 Co-op 项目。", path: ["包装 Co-op","包装工程师","高级工程师","部门负责人"] },
+    "迪士尼商店": { intro: "华特迪士尼旗下零售商店部门，上海设有产品设计创意岗位，多为实习岗。", path: ["设计实习生","设计师","高级设计师","设计主管"] },
+    "宝姿": { intro: "加拿大高端服装品牌（Ports），国内校招覆盖设计与时尚方向，多为底薪 + 提成结构。", path: ["设计师 / 管培生","设计师","高级设计师","设计经理"] },
+    "Primark": { intro: "爱尔兰平价快时尚零售商，设有 Trainee Designer 与视觉陈列经理岗位，以英国 / 欧洲为主。", path: ["Trainee 设计师","设计师","高级设计师","设计主管 / 经理"] },
+    "斐乐": { intro: "安踏旗下运动品牌 FILA，零售管培（设计方向）覆盖多城市。", path: ["零售管培生","储备店长","职能专员","区域 / 职能主管"] },
+    "SHEIN": { intro: "中国跨境快时尚电商，广州总部招聘买手（服装设计相关背景优先）。", path: ["买手助理","买手","高级买手","买手经理"] },
+    "Macy's": { intro: "美国连锁百货公司，Executive Development Program 覆盖商品企划与买手方向。", path: ["EDP 培训生","助理买手 / 企划","买手","高级买手","部门经理"] },
+    "TJX": { intro: "国际折扣零售集团（TK Maxx 等），Merchandising 管培项目面向应届生。", path: ["管培生","助理买手","买手","高级买手","经理"] },
+    "H&M": { intro: "瑞典快时尚集团，在线视觉陈列（Online VM）岗位设于上海。", path: ["VM 专员","高级 VM","VM 经理"] },
+    "Dior": { intro: "法国奢侈品牌（LVMH 旗下），时装、美妆与腕表品类，视觉陈列实习覆盖英国等市场。", path: ["VM 实习","VM 专员","高级 VM","VM 经理"] },
+    "Google": { intro: "美国科技公司，客户增长与销售 / 服务类早期项目面向 2027 届毕业生。", path: ["客户增长专员","高级专员","团队负责人"] },
+    "Appian": { intro: "美国低代码软件公司，解决方案顾问岗位面向应届生，服务企业客户。", path: ["助理解决方案顾问","解决方案顾问","高级顾问","团队负责人"] },
+    "Gartner": { intro: "美国 IT 研究与咨询公司，客户成功岗位面向应届生。", path: ["客户成功专员","高级专员","客成经理"] },
+    "Oracle NetSuite": { intro: "甲骨文旗下云 ERP 品牌，客户成功顾问岗位面向应届生。", path: ["客户成功顾问","高级顾问","团队负责人"] },
+    "顾家家居": { intro: "中国家居龙头企业（顾家集团），业务覆盖沙发、床垫、定制家具等，设有产品设计与结构设计岗位，本科起薪有竞争力。", path: ["产品/结构设计师","高级设计师","设计主管","设计经理"] },
+    "睿联技术": { intro: "中国安防与智能硬件公司（Reolink），产品远销海外，工业设计团队做智能摄像机等产品，薪资在私企设计岗中偏上。", path: ["工业设计师","高级产品设计师","设计主管","设计负责人"] },
+    "广东伟经": { intro: "广东金属家居用品制造企业，招聘工业设计岗，主打五金家居与厨卫产品。", path: ["工业设计师","高级设计师","设计主管"] },
+    "TikTok 字节跳动": { intro: "字节跳动旗下短视频平台，全球用户规模大，产品设计团队负责移动端与 AI 产品体验，实习与校招岗位多。", path: ["产品设计师","高级产品设计师","设计组长","设计负责人"] },
+    "小米": { intro: "中国科技公司（Xiaomi），产品覆盖手机、智能硬件、家电，设计中心与包装设计团队规模大。", path: ["设计师","高级设计师","设计主管","设计总监"] },
+    "蔚来": { intro: "中国智能电动汽车公司（NIO），体验设计（NIO House、App、车载 HMI）团队覆盖全链路，上海总部为主。", path: ["体验设计师","高级体验设计师","设计负责人"] },
+    "延锋": { intro: "中国汽车内饰供应商，招聘 CMF 设计师，覆盖汽车座椅、内饰方向。", path: ["CMF 设计师","高级 CMF 设计师","设计主管"] },
+    "博西华电器": { intro: "博西家电中国工厂，家电制造商，招聘 CMF 与结构设计战略实习生。", path: ["设计实习生","CMF / 结构设计师","高级设计师","设计主管"] },
+    "宝姿": { intro: "加拿大高端服装品牌（Ports），国内校招覆盖设计与时尚方向，多为底薪 + 提成结构。", path: ["设计师 / 管培生","设计师","高级设计师","设计经理"] },
+    "Vans": { intro: "VF 集团旗下滑板/街头文化鞋服品牌，设计团队覆盖鞋履、服装与印花。", path: ["设计师","高级设计师","设计主管","设计总监"] }
+  },
+  /* 各企业求职要求（与 companyLib 键名对齐，弹层中展示） */
+  companyReq: {
+    "Apple": "机械工程/包装科学等理工科学位；熟练 3D/2D CAD；对结构与材料敏感；英语工作环境",
+    "Dyson": "工业设计/产品设计学位；作品集体现创新与量产落地能力；英语流利",
+    "LG Electronics": "设计相关专业学位；iF/红点等获奖经历优先；作品集完整",
+    "Epson": "设计相关专业；Red Dot 获奖团队背景优先；注重工艺细节与量产",
+    "Siemens": "工业设计背景，医疗器械方向优先；跨团队协作；良好英语沟通",
+    "General Motors": "工业设计学位，交通工具设计方向；CMF/品牌设计敏感度；作品集",
+    "奇瑞捷豹路虎": "本科工业设计 / 研究生工业设计工程；2025/2026 届；造型功底 + 工程思维",
+    "BMW": "人机交互/工业设计/UX 学位；流利英语；Axure/Sketch/Figma；HMI 概念设计",
+    "SAP": "工业设计专业；良好英语沟通；UX 设计实习经历佳",
+    "Johnson Controls": "工业设计（CMF）+ 用户体验（UX）复合背景；作品集突出两者结合",
+    "Autodesk": "建筑与工程软件用户体验；对 CAD/BIM 领域有兴趣；英语工作语言",
+    "TikTok": "2027 届本科及以上；人机交互/AI/设计专业；Figma；熟悉移动端设计规范",
+    "现代汽车": "概念到量产用户体验；UX Studio；设计学位",
+    "L'Oréal": "设计学位硬性要求，顶尖设计院校优先；精品店/柜台/快闪店空间设计；与研发/运营/营销协作",
+    "Kenvue": "包装开发与验证；材料与工艺知识；工程思维",
+    "Lenovo": "包装设计；关注可持续设计趋势；结构与软件工具",
+    "IDEO": "设计思维与人本设计；跨学科团队协作；作品集体现调研与迭代",
+    "Accenture Song": "数字产品设计师；信息架构/用户测试；商业咨询理解",
+    "Gensler": "产品设计；为建筑环境设计家具/灯具；空间感知力",
+    "Aedas": "建筑设计背景 + 产品实践；团队协作；英语沟通",
+    "Nike": "产品设计/工业设计学位；材料探索 + 快速原型；创新配饰设计",
+    "耐克": "可接受设计/服装专业应届生；旗舰店陈列；视觉审美与品牌表达",
+    "Converse": "鞋履设计；与设计/产品管理/开发团队协作；材料 + 细节融合",
+    "Puma": "服装/鞋履设计；为关键客户和零售渠道设计开发产品线",
+    "Adidas": "跑步鞋品类；推动创意文化 + 产品故事",
+    "Bottega Veneta": "产品设计/建筑学位；米兰；奢侈品工艺与审美",
+    "LVMH": "产品开发岗需工业设计或工程学位；建筑团队需建筑/室内设计 + AutoCAD；店铺视觉指导需精通产品品类；零售管培应届和往届均可",
+    "Inditex": "应届/1 年内经验；专业不限，服装设计/艺术设计/时尚管理优先；良好中英文；销售数据分析",
+    "Chanel": "将创意愿景转化为中国市场商品策略；奢侈品商业理解",
+    "Tory Burch": "市场洞察 + 时尚趋势理解；本地化商品组合",
+    "Amer Sports": "市场洞察延伸至商品策略；产品驱动品牌增长；服装设计管培 12–15K/月",
+    "Fendi": "时尚/设计/艺术学位；10 年以上 VM/零售经验（经理岗）；视觉陈列驱动品牌形象",
+    "历峰集团": "建筑或室内设计背景；零售店铺规划；AutoCAD",
+    "DoorDash": "设计或技术相关学位；2027 年夏季毕业；Figma + AI 工具",
+    "Figma": "视觉设计/交互设计；原型能力；设计系统兴趣",
+    "优衣库": "专业不限；CET4≥425 或 IELTS≥5.0；接受全国调动；80 小时店铺实践；税前月薪 11,200–14,800 元",
+    "Canva": "服务品牌与营销团队；设计解决方案顾问；英语工作语言",
+    "Stripe": "客户成功/解决方案岗；跨时区协作；英语沟通",
+    "Payoneer": "客户成功专员；跨境电商行业理解",
+    "JetBrains": "客户成功；开发者工具与服务体验理解",
+    "ZURU": "设计类专业（产品/包装/插画）；本科及以上；深圳；10–15K/月",
+    "明门集团": "机械/材料/力学类；CET-4；产品研发设计；东莞",
+    "MillerKnoll": "产品设计/工业设计学位；伦敦；办公家具设计",
+    "凯捷咨询": "本科设计相关专业；UI/UX；实习后转正；上海",
+    "IBM": "2027 届；UX/体验设计；英语；Austin/Singapore 岗位可参考当地薪资",
+    "Palantir": "2027 届 New Grad；纽约/伦敦；产品设计师；英语",
+    "Revolut": "Graduate Programme 2027；伦敦；产品设计；英语",
+    "Tesla": "CMF Design Intern；Hawthorne；冬季/春季 2027；$20–50/小时",
+    "延锋": "汽车座椅/内饰方向；CMF 设计师；约 10K/月起",
+    "博西华电器": "2027 届；实习≥4 个月；CMF 与结构设计",
+    "安姆科": "2027 届『未来人才计划』；包装工程/设计；实习补贴 2,500/月 + 免费用餐/宿舍",
+    "P&G": "Design Co-op Summer 2027；Cincinnati；设计专业；$29–50/小时",
+    "Haleon": "Packaging Development Designer；英国 Weybridge；Industrial Placement 2027",
+    "Philips": "Packaging Engineer Co-op；Winter 2027；$26–29/小时 + 加班费",
+    "迪士尼商店": "产品设计创意实习；上海；6K/月",
+    "宝姿": "服装设计/时尚传播专业优先；底薪 + 提成",
+    "Primark": "2027 夏季开始；12 个月培养项目；大众时尚零售理解",
+    "斐乐": "零售管培（设计方向）；终端实训→储备店长→职能专员路径",
+    "SHEIN": "服装设计相关专业；买手；本科及以上；广州",
+    "Macy's": "Executive Development Program；Merchandising & Buying；纽约；$54,600–90,960/年",
+    "TJX": "Merchandising & Buying Development Programme；英国 Watford；£38K–52K/年",
+    "H&M": "应届本科；Online Visual Merchandiser；上海静安；15–20K/月",
+    "Dior": "VM 实习；英国；视觉审美与零售陈列理解",
+    "Google": "Customer Growth Associate；2027 Start；英语；$72,000–102,000/年 + 奖金 + 股权",
+    "Appian": "2027 届；解决方案顾问；McLean VA；$95,000/年",
+    "Gartner": "Client Success Associate；Irving TX；2026 & 2027 届",
+    "Oracle NetSuite": "客户成功顾问；2027 年 1 月入职；$24.62–50.43/小时",
+    "顾家家居": "本科设计/机械类；产品与结构设计方向；年薪≥13 万；需作品集",
+    "睿联技术": "工业设计/产品设计；有量产与出海产品经验优先；13–18 万/年",
+    "广东伟经": "工业设计；五金家居/厨卫产品方向；7–9.5K/月",
+    "TikTok 字节跳动": "2027 届本科及以上；人机交互/AI/设计专业；Figma；熟悉移动端规范",
+    "小米": "设计相关专业；产品/包装方向；作品集完整，有量产落地案例优先",
+    "蔚来": "体验设计方向；对汽车/HMI 有兴趣；作品集体现全链路设计能力",
+    "延锋": "汽车座椅/内饰方向；CMF 设计师；约 10K/月起",
+    "博西华电器": "2027 届；实习≥4 个月；CMF 与结构设计",
+    "宝姿": "服装设计/时尚传播专业优先；底薪 + 提成",
+    "Vans": "鞋服设计专业；街头文化审美；材料与印花能力；英语工作环境"
+  },
+  /* 职业规划模块：四类岗位对比 + 央美选择建议 */
+  careerPlan: {
+    title: "管培生 vs 普通岗 · 外企 vs 私企",
+    subtitle: "四类岗位完整对比，帮你选对入场姿势",
+    overview: {
+      dims: ["薪资起点", "培养体系", "职业发展路径", "工作内容", "核心要求", "工作强度", "稳定性"],
+      cols: ["外企管培生", "私企管培生", "外企普通岗位", "私企普通岗位"],
+      rows: [
+        ["9K–20K/月（宝洁 15–20K，达能 15–17.5K，亿滋 10–15K）", "范围极宽：头部年包 50 万+，中腰部 5–10K/月", "10K–15K/月为主（ZURU 10–15K，宝可梦 11K）", "7K–15K/月为主（顾家本科年薪≥13 万，睿联工业设计 13–18 万/年）"],
+        ["体系化轮岗 + 导师制 + 高层关注，按未来领导者方向培养", "差异极大：头部体系完善，大量中小企业名不副实，可能沦为普通岗", "岗位固定，以通用培训 + 专业技能为主，无系统性轮岗", "岗位固定，培训以快速上手为目标，体系性弱"],
+        ["快车道：3–5 年可到经理级，有清晰晋升通道", "不确定性高：头部有机会快速晋升，中腰部承诺常无法兑现", "按部就班：晋升节奏较慢但路径清晰", "陡峭但窄：做得好晋升快，但天花板取决于公司命运"],
+        ["多元化：轮岗接触不同业务，建立行业全局观", "可能较单一：轮岗机会有限，取决于公司实际投入", "专一深入：在特定职能做深做精", "宽而杂：一人往往负责很宽的职责范围"],
+        ["综合素质：领导力、商业洞察、英语流利（快消要求雅思 7.0+）", "业务能力：快速上手、为业务创造价值", "专业能力：岗位所需的硬技能（软件、方法论）", "即战力 + 抗压：能快速产出，接受高强度节奏"],
+        ["中等：WLB 较好，但评估期有压力", "高：视公司而定，头部可能高强度", "较低：朝九晚六、不打卡、年假完善", "高：加班普遍，节奏快，反馈直接"],
+        ["高：有内部转岗机制，福利体系完善", "与公司命运强绑定：公司好则机会多，调整则风险直接", "高：成熟跨国企业体系提供安全感", "中低：业务调整直接影响岗位"]
+      ]
+    },
+    cards: [
+      { key: "外企管培生", color: "#1E2A3E", tag: "首选推荐", tagline: "体系化轮岗，按未来领导者培养", salary: "9K–20K/月（宝洁 15–20K、达能 15–17.5K、亿滋 10–15K）+ 完善福利（补充医疗、企业年金、年假 15 天+）", core: "综合素质：领导力、商业洞察、英语流利（快消要求雅思 7.0+）", dev: "快车道：3–5 年做到经理级，有清晰晋升通道", content: "多元化轮岗，接触不同业务，建立行业全局观；WLB 中等", fit: "希望快速成长为管理者、想要体系化培养与稳定节奏的人" },
+      { key: "私企管培生", color: "#A65D52", tag: "高方差", tagline: "头部高薪高速，中小企业名不副实", salary: "范围极宽：头部（如百度）年包 50 万+ 含签字费；大量中小企业月薪仅 5–10K", core: "业务能力：快速上手、为业务创造价值；判断看有无往届管培生晋升案例", dev: "不确定性高：头部有机会快速晋升，中腰部承诺常无法兑现", content: "轮岗机会有限，可能较单一；强度高，与公司命运强绑定", fit: "能承受不确定性、追求快速试错和高上限的人" },
+      { key: "外企普通岗位", color: "#47708F", tag: "稳中求进", tagline: "专家路线，风险最低的起点", salary: "10K–15K/月为主（ZURU 10–15K、宝可梦 11K）+ 成熟福利与假期", core: "专业能力：岗位所需硬技能（软件、方法论）；英语工作环境", dev: "按部就班：晋升慢但清晰；保留管理/专家双通道", content: "专一深入，在特定职能做深做精；WLB 好", fit: "不确定长期方向、想先进入体系再选择的人" },
+      { key: "私企普通岗位", color: "#9A7B4B", tag: "快速成长", tagline: "离市场近、反馈直接", salary: "7K–15K/月为主（顾家本科年薪≥13 万、睿联工业设计 13–18 万/年、伟经 7–9.5K/月）", core: "即战力 + 抗压：快速产出，接受高强度节奏", dev: "陡峭但窄：做得好晋升快，但天花板取决于公司命运", content: "宽而杂：一人覆盖很宽职责；加班普遍；成长快", fit: "优先考虑成长速度与职业上限、愿意『练级』后跳外企更高职级的人" }
+    ],
+    details: [
+      { title: "薪资：私企『上限高』，外企『下限稳』", blocks: [
+        { name: "外企管培生", text: "薪资集中在 9K–20K/月，宝洁 15–20K，达能 15–17.5K，亿滋 10–15K；优势在于福利体系完善（补充医疗、企业年金、带薪年假 15 天+），实际总包含金量高于表面月薪。" },
+        { name: "私企管培生", text: "薪资方差极大：头部如百度管培生年包 50 万+（含超高签字费），但大量中小企业月薪仅 5–10K，且培养承诺常无法兑现。判断标准：看这家公司是否有公开的、往届管培生的晋升案例。" },
+        { name: "外企普通岗位", text: "设计类约 10K–15K/月，如 ZURU 设计岗 10–15K，宝可梦固定月薪税前 11,000 元。" },
+        { name: "私企普通岗位", text: "设计类约 7K–15K/月：顾家家居本科年薪不少于 13 万（约 10.8K/月），睿联技术工业设计 13–18 万/年（约 10.8–15K/月），广东伟经工业设计 7–9.5K/月。" }
+      ]},
+      { title: "培养体系：管培生的『加速度』来自哪里", blocks: [
+        { name: "外企管培生", text: "核心价值在于『体系』：阿迪达斯设计管培生会在不同职能和品类间轮岗，参与真实创意简报，并与全球产品创造中心建立联系；宝洁『内部培养』、联合利华『三环模式』都是数十年验证的成熟路径。" },
+        { name: "私企管培生", text: "核心问题在于『方差』：头部私企（百度、部分互联网大厂）投入巨大，但大量中小企业『管培生』实质是销售岗或普通职能岗的包装。判断方法：看是否含跨部门轮岗、明确导师分配、以及往届学员定岗去向。" },
+        { name: "外企普通岗位", text: "不承诺『加速度』，成长取决于具体团队水平和项目质量；双通道保留专家路线。" },
+        { name: "私企普通岗位", text: "成长更『野生』：职责范围更宽，能从数据和用户反馈快速看到结果，但深度思考与体系化沉淀时间常被压缩。" }
+      ]},
+      { title: "职业发展：管理者 vs 专家 vs 执行者", blocks: [
+        { name: "外企管培生", text: "走『管理者预备役』路线：快消行业通常承诺 3–5 年做到经理级；科技/工业类通过跨职能轮岗成长为兼具商业敏锐度与管理潜力的人才。" },
+        { name: "私企管培生", text: "发展高度依赖公司成长速度：扩张期一年一个台阶，调整期反而成为『高成本包袱』。适合愿意承担不确定性、追求快速试错的人。" },
+        { name: "外企普通岗位", text: "保留『专家路线』：欧美外企通常有管理（Management）和专家（Individual Contributor）双通道，可长期做资深设计师，通过管理更复杂的设计业务体现价值。" },
+        { name: "私企普通岗位", text: "成长更『野生』：接触更宽职责，设计好坏很快从数据与反馈验证，但体系化沉淀时间常被压缩。" }
+      ]},
+      { title: "工作强度与稳定性：两种生活方式的交换", blocks: [
+        { name: "外企（管培生和普通岗）", text: "WLB 优势显著：ZURU 明确标注『外企待遇 + 工作 WLB，六险一金包吃住 + 双休，朝九晚六弹性上班』；代价是专业成长速度可能比私企慢，项目节奏从容。" },
+        { name: "私企", text: "工作强度普遍更高：设计院项目周期紧、赶图熬夜家常便饭；好处是离市场近、反馈直接、成长快。" },
+        { name: "稳定性对比", text: "外企成熟体系提供更强安全感（内部转岗、福利保障），但『稳定』也意味着变化更慢、对市场新趋势反应不如私企敏捷；私企稳定性与公司命运强绑定，调整（含裁员）更直接。" }
+      ]}
+    ],
+    advice: [
+      { tag: "追求成长与上限", title: "头部私企普通岗 → 3–5 年积累 → 跳槽外企更高职级", text: "在能快速接触完整商业闭环的地方『练级』，带着扎实的作品和行业认知，再进入外企体系。" },
+      { tag: "追求体系与稳定", title: "外企管培生（设计方向）是首选", text: "阿迪达斯设计管培生、亚玛芬服装设计管培生、雅诗兰黛中国设计中心管培生都与你的专业高度对口；央美背景 + 雅思 6.5 + 作品集在此赛道有明确差异化优势。" },
+      { tag: "长期方向不确定", title: "外企普通岗（设计类）是风险最低的起点", text: "用 1–2 年了解行业运作逻辑，同时保持作品集更新和行业阅读；之后可内部转岗管培、跳私企追高薪，或沿专家路线深耕。" }
+    ]
+  }
+};
+</script>
+<script>
+/* SECTION: app-logic — 主应用逻辑（状态/打卡/日历/统计/渲染） */
+(function () {
+  "use strict";
+  var D = window.APP_DATA;
+  var LS_KEY = "cfplan_v1";
+
+  /* ---------- 工具 ---------- */
+  function pad(n) { return n < 10 ? "0" + n : "" + n; }
+  function dstr(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+  function parseD(s) { var p = s.split("-"); return new Date(+p[0], +p[1] - 1, +p[2]); }
+  function today() { return new Date(); }
+  function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  var CN_NUM = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"];
+  function stageCn(n) { return CN_NUM[n + 1] != null ? "阶段" + CN_NUM[n + 1] : "阶段" + (n + 1); }
+
+  /* ---------- 状态 ---------- */
+  var state = { checkins: {} };
+  function load() {
+    try {
+      var o = JSON.parse(localStorage.getItem(LS_KEY));
+      if (o && o.checkins) state = o;
+    } catch (e) {}
+  }
+  function save() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+  load();
+
+  /* ---------- 阶段判定 ---------- */
+  function stageIndexForDate(d) {
+    var t = dstr(d);
+    for (var i = 0; i < D.stages.length; i++) {
+      if (t <= D.stages[i].end) return i;
+    }
+    return D.stages.length - 1;
+  }
+  function currentStage() { return D.stages[stageIndexForDate(today())]; }
+
+  /* ---------- 任务集合 ---------- */
+  /* 每日/每周打卡项 [{key, type, group, text}] */
+  function taskItems(stage) {
+    var out = [];
+    var groups = stage.dailyGroups || [];
+    if (groups.length) {
+      groups.forEach(function (g, gi) {
+        g.items.forEach(function (t, i) {
+          out.push({ key: stage.id + "|g" + gi + "|" + i, type: "daily", group: g.g, text: t });
+        });
+      });
+    } else if (stage.daily) {
+      stage.daily.forEach(function (t, i) {
+        out.push({ key: stage.id + "|d|" + i, type: "daily", group: "", text: t });
+      });
+    }
+    if (stage.weekly) {
+      stage.weekly.forEach(function (t, i) {
+        out.push({ key: stage.id + "|w|" + i, type: "weekly", group: "每周检查项", text: t });
+      });
+    }
+    return out;
+  }
+  /* 关键节点（阶段级里程碑，一次性打卡）[{key, text, date}] */
+  function nodeItems(stage) {
+    var out = [];
+    if (stage.nodes) {
+      stage.nodes.forEach(function (n, i) {
+        out.push({ key: stage.id + "|node|" + i, text: n.text, date: n.date || "" });
+      });
+    }
+    return out;
+  }
+  function checkKey(stageId, date, itemKey) { return stageId + "@" + date + "|" + itemKey; }
+  function isChecked(stageId, date, itemKey) { return !!state.checkins[checkKey(stageId, date, itemKey)]; }
+  function setChecked(stageId, date, itemKey, v) {
+    var k = checkKey(stageId, date, itemKey);
+    if (v) state.checkins[k] = true; else delete state.checkins[k];
+    save();
+  }
+  function isNodeDone(key) { return !!state.checkins[key]; }
+  function setNode(key, v) {
+    if (v) state.checkins[key] = true; else delete state.checkins[key];
+    save();
+  }
+
+  function stageProgress(stage, dateStr) {
+    var items = taskItems(stage);
+    if (!items.length) return { done: 0, total: 0, pct: 0 };
+    var done = 0;
+    items.forEach(function (it) { if (isChecked(stage.id, dateStr, it.key)) done++; });
+    return { done: done, total: items.length, pct: Math.round(done / items.length * 100) };
+  }
+  function dayCheckedCount(stageId, dateStr) {
+    var prefix = stageId + "@" + dateStr + "|";
+    var n = 0;
+    for (var k in state.checkins) { if (k.indexOf(prefix) === 0) n++; }
+    return n;
+  }
+  function dayTotalCount(stageId) {
+    var st = null;
+    D.stages.forEach(function (s) { if (s.id === stageId) st = s; });
+    return st ? taskItems(st).length : 0;
+  }
+  function streakDays() {
+    var n = 0, d = today();
+    var started = false;
+    for (var i = 0; i < 400; i++) {
+      var ds = dstr(d);
+      var has = false;
+      D.stages.forEach(function (s) {
+        var prefix = s.id + "@" + ds + "|";
+        for (var k in state.checkins) {
+          if (k.indexOf(prefix) === 0) { has = true; return; }
+        }
+      });
+      if (has) { n++; started = true; }
+      else if (i === 0 && !started) { /* today none, allow from yesterday */ }
+      else break;
+      d.setDate(d.getDate() - 1);
+    }
+    return n;
+  }
+  function totalStats() {
+    var totalItems = 0, doneItems = 0;
+    D.stages.forEach(function (s) {
+      taskItems(s).forEach(function (it) {
+        totalItems++;
+        var prefix = s.id + "@";
+        for (var k in state.checkins) {
+          if (k.indexOf(prefix) === 0 && k.indexOf("|" + it.key) > -1) { doneItems++; break; }
+        }
+      });
+      nodeItems(s).forEach(function (it) {
+        totalItems++;
+        if (state.checkins[it.key]) doneItems++;
+      });
+    });
+    return { doneItems: doneItems, totalItems: totalItems, pct: totalItems ? Math.round(doneItems / totalItems * 100) : 0 };
+  }
+
+  /* ---------- 渲染辅助 ---------- */
+  function el(tag, cls, html) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (html != null) e.innerHTML = html;
+    return e;
+  }
+  function clickableChip(name) {
+    return '<span class="chip clickable" data-co="' + esc(name) + '">' + esc(name) + "</span>";
+  }
+  function coCell(name) {
+    return "<td class='co-cell' data-co='" + esc(name) + "'>" + esc(name) + "</td>";
+  }
+
+  /* ---------- 公司详情弹层 ---------- */
+  var CO_ALIAS = {
+    "LVMH（Loewe）": "LVMH",
+    "LVMH Fashion Group": "LVMH",
+    "Inditex/Zara": "Inditex",
+    "斐乐FILA": "斐乐",
+    "L'Oréal": "L'Oréal",
+    "Disney Store": "迪士尼商店"
+  };
+  function lookupCompany(name) {
+    if (!D.companyLib) return null;
+    var target = CO_ALIAS[name] || name;
+    var n = String(target).replace(/[’‘`]/g, "'").replace(/\s+/g, " ").trim().toLowerCase();
+    var keys = Object.keys(D.companyLib);
+    for (var i = 0; i < keys.length; i++) {
+      var k = String(keys[i]).replace(/[’‘`]/g, "'").replace(/\s+/g, " ").trim().toLowerCase();
+      if (k === n) return D.companyLib[keys[i]];
+    }
+    return null;
+  }
+  function openCompany(name) {
+    var inner = document.getElementById("company-sheet-inner");
+    document.getElementById("company-sheet-title").textContent = name;
+    var info = lookupCompany(name);
+    var reqKey = CO_ALIAS[name] || name;
+    var req = D.companyReq && D.companyReq[reqKey];
+    var h = "";
+    if (info) {
+      h += '<section class="detail-sec"><h4>公司简介</h4><p class="co-intro">' + esc(info.intro) + "</p></section>";
+      if (req) {
+        h += '<section class="detail-sec"><h4>求职要求</h4><div class="co-req"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><p>' + esc(req) + "</p></div></section>";
+      }
+      h += '<section class="detail-sec"><h4>晋升路径（参考）</h4><p class="co-path-note">不同公司职级命名有差异，以下为常见层级参考，供投递与面试时对照。</p><div class="co-path">';
+      info.path.forEach(function (p, i) {
+        h += '<div class="co-path-step"><span class="co-path-no">' + (i + 1) + "</span><span>" + esc(p) + "</span></div>";
+      });
+      h += "</div></section>";
+      h += '<section class="detail-sec"><h4>投递提示</h4><div class="callout">以公司官网招聘页为准；投递时关注岗位对英语、作品集与实习经历的具体要求。</div></section>';
+    } else {
+      h = '<section class="detail-sec"><h4>公司简介</h4><div class="callout">暂未收录「' + esc(name) + '」的详细资料，可参考岗位列表中的关键要求。</div></section>';
+    }
+    inner.innerHTML = h;
+    document.getElementById("company-sheet").classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+  function closeCompanySheet() {
+    document.getElementById("company-sheet").classList.remove("open");
+    document.body.style.overflow = "";
+  }
+
+  /* ---------- 薪资标签 ---------- */
+  function tagsFor(r) {
+    var arr = [];
+    var t = (r[0] + " " + (r[1] || "") + " " + (r[2] || "") + " " + (r[3] || "")).toLowerCase();
+    var overseas = /[$£€]/.test(r[2]) || /(伦敦|纽约|法国|英国|德国|美国|新加坡|米兰|austin|san jose|texas|cincinnati|watford|weybridge|irving|mclean|hawthorne|california|new york|vikers)/i.test(t);
+    var intern = /实习|intern|co-op|placement|trainee|apprentice/.test(t);
+    var hidden = /未公开|competitive/.test(t);
+    /* 每条都给出市场区域标签，实习/未公开作为追加信息 */
+    arr.push(overseas ? { t: "海外", c: "#1E2A3E", bg: "#EDF0F5" } : { t: "国内", c: "#33605F", bg: "#E7EFEF" });
+    if (intern) arr.push({ t: "实习", c: "#2E6B59", bg: "#E4EFEA" });
+    if (hidden) arr.push({ t: "未公开", c: "#8A919C", bg: "#EEEFF2" });
+    return arr;
+  }
+  function tagBadges(r) {
+    return tagsFor(r).map(function (x) {
+      return '<span class="tag-badge" style="color:' + x.c + ";background:" + x.bg + '">' + x.t + "</span>";
+    }).join("");
+  }
+
+  /* ---------- 视图切换 ---------- */
+  var currentView = "timeline";
+  function switchView(v) {
+    currentView = v;
+    document.querySelectorAll(".view").forEach(function (x) { x.classList.remove("active"); });
+    var vw = document.getElementById("view-" + v);
+    if (vw) vw.classList.add("active");
+    document.querySelectorAll(".tab-btn").forEach(function (b) {
+      b.classList.toggle("active", b.getAttribute("data-view") === v);
+    });
+    if (v === "timeline") renderTimeline();
+    if (v === "today") renderToday();
+    if (v === "jobs") renderJobs();
+    if (v === "career") renderCareer();
+    if (v === "me") renderMe();
+    window.scrollTo(0, 0);
+  }
+
+  /* ================= 职业规划 ================= */
+  var careerTab = 0;
+  function renderCareer() {
+    var CP = D.careerPlan;
+    /* 头部简介 */
+    var intro = document.getElementById("career-intro");
+    intro.innerHTML = "";
+    intro.style.setProperty("--ac", "#1E2A3E");
+    intro.innerHTML =
+      '<div class="career-hero-tag">' + esc(CP.title) + "</div>" +
+      "<h3>" + esc(CP.subtitle) + "</h3>" +
+      "<p>四类岗位横向对比 → 各维度拆解 → 央美背景下的选择建议。投递时可在右上角『岗位薪资』页对照具体薪资。</p>";
+    /* 四个速览卡片（精简为入口卡，避免与总览表重复） */
+    var cards = document.getElementById("career-cards");
+    cards.innerHTML = "";
+    CP.cards.forEach(function (c, i) {
+      var card = el("div", "career-card career-quick");
+      card.style.setProperty("--ac", c.color);
+      card.innerHTML =
+        '<span class="career-tag" style="background:' + c.color + '">' + esc(c.tag) + "</span>" +
+        "<h4>" + esc(c.key) + "</h4>" +
+        '<p class="career-tagline">' + esc(c.tagline) + "</p>" +
+        '<span class="career-view">查看完整对比 →</span>';
+      card.addEventListener("click", function () {
+        careerTab = i;
+        renderCareerTable();
+        document.getElementById("career-overview").scrollIntoView({ behavior: "smooth" });
+      });
+      cards.appendChild(card);
+    });
+    /* 总览表 tab */
+    renderCareerTable();
+    /* 详细拆解（折叠式） */
+    var det = document.getElementById("career-details");
+    det.innerHTML = "";
+    CP.details.forEach(function (d, di) {
+      var sec = el("div", "career-fold");
+      var h = '<button class="career-fold-head"><span>' + esc(d.title) + "</span><i class='fold-arrow'></i></button>";
+      h += '<div class="career-fold-body">';
+      d.blocks.forEach(function (b) {
+        h += '<div class="career-block"><div class="career-block-name" style="color:' + cardColor(b.name) + '">' + esc(b.name) + "</div><p>" + esc(b.text) + "</p></div>";
+      });
+      h += "</div>";
+      sec.innerHTML = h;
+      sec.querySelector(".career-fold-head").addEventListener("click", function () {
+        sec.classList.toggle("open");
+      });
+      det.appendChild(sec);
+    });
+    /* 央美建议（折叠式：整组一个折叠块） */
+    var adv = document.getElementById("career-advice");
+    adv.innerHTML = "";
+    var advFold = el("div", "career-fold");
+    var advH = '<button class="career-fold-head"><span>央美背景下的选择建议</span><i class="fold-arrow"></i></button>';
+    var advBody = '<div class="career-fold-body">';
+    CP.advice.forEach(function (a, i) {
+      advBody += '<div class="advice-card"><span class="advice-no">' + (i + 1) + "</span><div><b>" + esc(a.title) + '</b><span class="advice-tag">' + esc(a.tag) + "</span><p>" + esc(a.text) + "</p></div></div>";
+    });
+    advBody += "</div>";
+    advFold.innerHTML = advH + advBody;
+    advFold.querySelector(".career-fold-head").addEventListener("click", function () {
+      advFold.classList.toggle("open");
+    });
+    adv.appendChild(advFold);
+  }
+  function cardColor(name) {
+    var CP = D.careerPlan;
+    for (var i = 0; i < CP.cards.length; i++) {
+      if (CP.cards[i].key === name) return CP.cards[i].color;
+    }
+    return "#1E2A3E";
+  }
+  function renderCareerTable() {
+    var CP = D.careerPlan;
+    var ov = CP.overview;
+    /* tabs */
+    var tabs = document.getElementById("career-tabs");
+    tabs.innerHTML = "";
+    ov.cols.forEach(function (col, i) {
+      var b = el("button", "career-tab-btn" + (i === careerTab ? " active" : ""));
+      b.style.setProperty("--ac", CP.cards[i].color);
+      b.textContent = col;
+      b.addEventListener("click", function () {
+        careerTab = i;
+        renderCareerTable();
+      });
+      tabs.appendChild(b);
+    });
+    /* 表格：选中类别 × 全部维度，第二列合并其余三类对照 */
+    var wrap = document.getElementById("career-overview");
+    wrap.innerHTML = "";
+    var c = CP.cards[careerTab];
+    var others = [];
+    ov.cols.forEach(function (col, i) { if (i !== careerTab) others.push(i); });
+    var h = '<div class="career-ov-head" style="--ac:' + c.color + '"><b>' + esc(c.key) + "</b><span>与其余三类逐维度对照</span></div>" +
+      '<div class="table-fit"><table class="data-table career-table"><thead><tr><th style="width:88px">维度</th><th>' + esc(c.key) + "</th><th>其余三类</th></tr></thead><tbody>";
+    ov.dims.forEach(function (dim, di) {
+      h += "<tr>";
+
+      /* 维度列（不跨行，避免表格错位） */
+      h += '<td class="dim-cell"><em>' + esc(ov.dims[di]) + "</em></td>";
+
+      /* 选中类别值 */
+      h += "<td>" + esc(ov.rows[di][careerTab]) + "</td>";
+
+      /* 其余三类合并对照 */
+      h += "<td><div class='ov-others'>";
+      others.forEach(function (oi) {
+        h += '<div class="ov-line"><span class="ov-name"><i style="background:' + CP.cards[oi].color + '"></i>' + esc(ov.cols[oi]) + "</span><span>" + esc(ov.rows[di][oi]) + "</span></div>";
+      });
+      h += "</div></td>";
+
+      h += "</tr>";
+    });
+    h += "</tbody></table></div>";
+    wrap.innerHTML = h;
+  }
+
+  /* ---------- 全局进度环 ---------- */
+  function ringSVG(pct, size, sw, color) {
+    var r = (size - sw) / 2, c = 2 * Math.PI * r;
+    var off = c * (1 - pct / 100);
+    return '<svg class="ring" width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + " " + size + '">' +
+      '<circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="rgba(0,0,0,.08)" stroke-width="' + sw + '"/>' +
+      '<circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="' + color + '" stroke-width="' + sw + '" stroke-linecap="round" stroke-dasharray="' + c + '" stroke-dashoffset="' + off + '" transform="rotate(-90 ' + size / 2 + " " + size / 2 + ')" style="transition:stroke-dashoffset .6s ease"/>' +
+      "</svg>";
+  }
+
+  /* ---------- 头部 ---------- */
+  function renderHeader() {
+    var st = currentStage();
+    var p = stageProgress(st, dstr(today()));
+    document.getElementById("header-stage").textContent = stageCn(st.no) + " · " + st.name;
+    document.getElementById("header-stage").style.color = st.color;
+    document.getElementById("headerDate").textContent = todayHint();
+    var ringBox = document.getElementById("header-ring");
+    ringBox.innerHTML = ringSVG(p.pct, 46, 4.5, st.color) + '<span class="ring-num">' + p.pct + "%</span>";
+  }
+  function todayHint() {
+    var d = today();
+    var w = ["日", "一", "二", "三", "四", "五", "六"][d.getDay()];
+    return (d.getMonth() + 1) + " 月 " + d.getDate() + " 日 · 周" + w;
+  }
+
+  /* ================= 旅程地图 ================= */
+  function renderTimeline() {
+    var wrap = document.getElementById("tl-list");
+    wrap.innerHTML = "";
+    var todayStr = dstr(today());
+    var cur = stageIndexForDate(today());
+    D.stages.forEach(function (s, i) {
+      var status = i < cur ? "done" : (i === cur ? "now" : "todo");
+      var p = stageProgress(s, todayStr);
+      var card = el("div", "stage-card tl-card");
+      card.style.setProperty("--ac", s.color);
+      card.innerHTML =
+        '<div class="tl-badge ' + status + '">' +
+          (status === "done" ? "✓" : status === "now" ? "●" : stageCn(i)) +
+        "</div>" +
+        '<div class="stage-card-body">' +
+          '<div class="stage-card-top"><h3>' + esc(s.name) + "</h3><span class='stage-time'>" + esc(s.time) + "</span></div>" +
+          '<p class="stage-tagline">' + esc(s.tagline) + "</p>" +
+          (i === cur || status === "done" ?
+            '<div class="mini-progress"><div class="mini-bar"><i style="width:' + p.pct + '%"></i></div><span>' + p.pct + "%</span></div>" : "") +
+          '<div class="stage-status-chip ' + status + '">' + (status === "done" ? "已过" : status === "now" ? "进行中" : "未开始") + "</div>" +
+        "</div>";
+      card.addEventListener("click", function () { openStageDetail(i); });
+      wrap.appendChild(card);
+    });
+  }
+
+  /* ---------- 阶段详情 ---------- */
+  function openStageDetail(i) {
+    var s = D.stages[i];
+    var box = document.getElementById("stage-sheet");
+    var inner = document.getElementById("stage-sheet-inner");
+    inner.style.setProperty("--ac", s.color);
+    var h = "";
+    h += '<div class="detail-hero" style="background:linear-gradient(135deg,' + s.color + "22," + s.color + "08)'>" +
+      '<div class="detail-hero-no" style="color:' + s.color + '">' + stageCn(s.no) + "</div>" +
+      "<h2>" + esc(s.name) + "</h2>" +
+      '<div class="detail-time">' + esc(s.time) + "</div>" +
+      '<p class="detail-tagline">' + esc(s.tagline) + "</p>" +
+      "</div>";
+    h += '<section class="detail-sec"><h4>核心任务</h4><ul class="dot-list">';
+    s.coreTasks.forEach(function (t) { h += "<li>" + esc(t) + "</li>"; });
+    h += "</ul></section>";
+    if (s.goalNote) {
+      h += '<section class="detail-sec"><h4>' + esc(s.goalNote.title) + '</h4><div class="callout">' + esc(s.goalNote.body) + "</div></section>";
+    }
+    if (s.nodes && s.nodes.length) {
+      h += '<section class="detail-sec"><h4>关键节点 <small class="sec-sub">完成一项点一项</small></h4><div class="task-list" id="dtl-nodes"></div></section>';
+    }
+    if (s.stageTasks && s.stageTasks.length) {
+      s.stageTasks.forEach(function (g) {
+        h += '<section class="detail-sec"><h4>' + esc(g.t) + '</h4><ul class="dot-list">';
+        g.items.forEach(function (t) { h += "<li>" + esc(t) + "</li>"; });
+        h += "</ul></section>";
+      });
+    }
+    if (s.principles && s.principles.length) {
+      h += '<section class="detail-sec"><h4>关键原则</h4><ul class="dot-list">';
+      s.principles.forEach(function (t) { h += "<li>" + esc(t) + "</li>"; });
+      h += "</ul></section>";
+    }
+    var items = taskItems(s);
+    if (items.length) {
+      h += '<section class="detail-sec"><h4>打卡清单（今日）</h4><div class="task-list" id="dtl-tasks"></div></section>';
+    }
+    if (s.weekly && s.weekly.length) {
+      h += '<section class="detail-sec"><h4>每周检查项</h4><ul class="check-list">';
+      s.weekly.forEach(function (t) { h += "<li>" + esc(t) + "</li>"; });
+      h += "</ul></section>";
+    }
+    if (s.companies && s.companies.length) {
+      h += '<section class="detail-sec"><h4>目标公司 / 岗位（外企） <small class="sec-sub">点击公司名查看简介与晋升路径</small></h4>';
+      s.companies.forEach(function (cat) {
+        h += '<div class="company-cat"><div class="company-cat-name">' + esc(cat.cat) + "</div>";
+        if (cat.list) {
+          h += '<div class="chip-row">';
+          cat.list.forEach(function (n) { h += clickableChip(n); });
+          h += "</div>";
+        }
+        if (cat.rows) {
+          h += '<div class="table-fit"><table class="data-table"><thead><tr><th>公司</th><th>岗位</th><th>关键要求</th></tr></thead><tbody>';
+          cat.rows.forEach(function (r) { h += "<tr>" + coCell(r[0]) + "<td>" + esc(r[1]) + "</td><td>" + esc(r[2]) + "</td></tr>"; });
+          h += "</tbody></table></div>";
+        }
+        h += "</div>";
+      });
+      h += "</section>";
+    }
+    /* 私企方向 */
+    if (s.privateNote) {
+      h += '<section class="detail-sec"><h4>私企方向 <small class="sec-sub">外企 + 私企双轨并行</small></h4><div class="callout private-note">' + esc(s.privateNote) + "</div></section>";
+    }
+    if (s.privateCompanies && s.privateCompanies.length) {
+      h += '<section class="detail-sec"><h4>目标公司 / 岗位（私企） <small class="sec-sub">点击公司名查看资料</small></h4>';
+      s.privateCompanies.forEach(function (cat) {
+        h += '<div class="company-cat"><div class="company-cat-name">' + esc(cat.cat) + "</div>";
+        if (cat.list) {
+          h += '<div class="chip-row">';
+          cat.list.forEach(function (n) { h += clickableChip(n); });
+          h += "</div>";
+        }
+        if (cat.rows) {
+          h += '<div class="table-fit"><table class="data-table"><thead><tr><th>公司</th><th>岗位</th><th>关键要求</th></tr></thead><tbody>';
+          cat.rows.forEach(function (r) { h += "<tr>" + coCell(r[0]) + "<td>" + esc(r[1]) + "</td><td>" + esc(r[2]) + "</td></tr>"; });
+          h += "</tbody></table></div>";
+        }
+        h += "</div>";
+      });
+      h += "</section>";
+    }
+    inner.innerHTML = h;
+    /* 填充关键节点打卡 */
+    var nl = document.getElementById("dtl-nodes");
+    if (nl) {
+      nodeItems(s).forEach(function (it) {
+        var r = document.createElement("label");
+        r.className = "task-chip-row node-row" + (isNodeDone(it.key) ? " checked" : "");
+        r.innerHTML = '<input type="checkbox" ' + (isNodeDone(it.key) ? "checked" : "") + '><span class="tick"></span><span class="task-txt">' + (it.date ? "<em>" + esc(it.date) + "</em>" : "") + esc(it.text) + '<i class="tag-node">阶段节点</i></span>';
+        r.addEventListener("change", function () {
+          setNode(it.key, r.querySelector("input").checked);
+          r.classList.toggle("checked", r.querySelector("input").checked);
+          renderHeader(); renderTimeline();
+        });
+        nl.appendChild(r);
+      });
+    }
+    /* 填充今日打卡清单 */
+    var tl = document.getElementById("dtl-tasks");
+    if (tl) {
+      var ds = dstr(today());
+      items.forEach(function (it) {
+        var r = document.createElement("label");
+        r.className = "task-chip-row" + (isChecked(s.id, ds, it.key) ? " checked" : "");
+        r.innerHTML = '<input type="checkbox" ' + (isChecked(s.id, ds, it.key) ? "checked" : "") + '><span class="tick"></span><span class="task-txt">' + (it.group ? "<em>" + esc(it.group) + "</em>" : "") + esc(it.text) + (it.type === "weekly" ? ' <i class="tag-w">每周</i>' : "") + "</span>";
+        r.addEventListener("change", function () {
+          setChecked(s.id, ds, it.key, r.querySelector("input").checked);
+          r.classList.toggle("checked", r.querySelector("input").checked);
+          renderHeader(); renderTimeline();
+        });
+        tl.appendChild(r);
+      });
+    }
+    box.classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+  function closeStageSheet() {
+    document.getElementById("stage-sheet").classList.remove("open");
+    document.body.style.overflow = "";
+  }
+
+  /* ================= 今日打卡 ================= */
+  var calDate = null;
+  var calMonthBase = null;
+  function renderToday() {
+    var s = currentStage();
+    var ds = dstr(today());
+    var info = document.getElementById("today-stageinfo");
+    info.innerHTML = "";
+    info.style.setProperty("--ac", s.color);
+    info.innerHTML =
+      '<div class="stage-tag" style="background:' + s.color + '">' + stageCn(s.no) + "</div>" +
+      "<h3>" + esc(s.name) + "</h3>" +
+      "<p>" + esc(s.tagline) + "</p>" +
+      '<div class="today-counts"><span>时段 ' + esc(s.time) + "</span></div>";
+    renderTaskDate(s, ds, document.getElementById("today-tasks"), "today");
+    renderTodayCounts();
+    renderCalendar();
+  }
+  function renderTaskDate(stage, ds, container, mode) {
+    container.innerHTML = "";
+    var items = taskItems(stage);
+    if (!items.length) { container.innerHTML = '<div class="empty">本阶段暂无逐日打卡项，参考每周检查项推进</div>'; return; }
+    var groups = {};
+    items.forEach(function (it) {
+      var g = it.group || (it.type === "weekly" ? "每周检查项" : "每日任务");
+      (groups[g] = groups[g] || []).push(it);
+    });
+    var p = stageProgress(stage, ds);
+    var head = el("div", "task-date-head");
+    head.innerHTML = "<span>" + (mode === "today" ? "今日任务" : "该日任务") + "</span><b>" + p.done + " / " + p.total + "</b>";
+    container.appendChild(head);
+    Object.keys(groups).forEach(function (g) {
+      var gd = el("div", "task-group");
+      gd.innerHTML = '<div class="task-group-name">' + esc(g) + "</div>";
+      var list = el("div", "task-list");
+      groups[g].forEach(function (it) {
+        var r = document.createElement("label");
+        r.className = "task-chip-row" + (isChecked(stage.id, ds, it.key) ? " checked" : "");
+        r.innerHTML = '<input type="checkbox" ' + (isChecked(stage.id, ds, it.key) ? "checked" : "") + "><span class='tick'></span><span class='task-txt'>" + esc(it.text) + (it.type === "weekly" ? ' <i class="tag-w">每周</i>' : "") + "</span>";
+        r.addEventListener("change", function () {
+          setChecked(stage.id, ds, it.key, r.querySelector("input").checked);
+          r.classList.toggle("checked", r.querySelector("input").checked);
+          renderHeader(); renderTimeline();
+          if (mode === "today") { renderTaskDate(stage, ds, container, "today"); }
+          renderTodayCounts();
+        });
+        list.appendChild(r);
+      });
+      gd.appendChild(list);
+      container.appendChild(gd);
+    });
+  }
+  function renderTodayCounts() {
+    var s = currentStage();
+    var ds = dstr(today());
+    var p = stageProgress(s, ds);
+    var num = document.getElementById("today-done-num");
+    var bar = document.getElementById("today-progress-bar");
+    if (num) { num.textContent = p.done + " / " + p.total; }
+    if (bar) { bar.style.width = p.pct + "%"; }
+    var ring = document.getElementById("today-ring");
+    if (ring) { ring.innerHTML = ringSVG(p.pct, 84, 7, s.color) + '<span class="ring-big">' + p.pct + "%</span>"; }
+    var btn = document.getElementById("btn-finish-all");
+    if (btn) btn.textContent = p.done === p.total && p.total > 0 ? "本日全部完成 ✓" : "一键完成今日任务";
+  }
+  function finishAllToday() {
+    var s = currentStage();
+    var ds = dstr(today());
+    taskItems(s).forEach(function (it) { setChecked(s.id, ds, it.key, true); });
+    renderToday(); renderHeader(); renderTimeline();
+  }
+
+  /* ---------- 日历 ---------- */
+  function renderCalendar() {
+    var base = calMonthBase || today();
+    var y = base.getFullYear(), m = base.getMonth();
+    var grid = document.getElementById("cal-grid");
+    grid.innerHTML = "";
+    document.getElementById("cal-title").textContent = y + " 年 " + (m + 1) + " 月";
+    var todayStr = dstr(today());
+    var selStr = calDate ? dstr(calDate) : todayStr;
+    var first = new Date(y, m, 1);
+    var startDow = first.getDay();
+    var dim = new Date(y, m + 1, 0).getDate();
+    for (var i = 0; i < startDow; i++) grid.appendChild(el("div", "cal-cell blank"));
+    for (var d = 1; d <= dim; d++) {
+      var dt = new Date(y, m, d);
+      var ds = dstr(dt);
+      var cell = el("div", "cal-cell");
+      if (ds === todayStr) cell.classList.add("is-today");
+      if (ds === selStr) cell.classList.add("selected");
+      var stageIdx = stageIndexForDate(dt);
+      var st = D.stages[stageIdx];
+      var cnt = dayCheckedCount(st.id, ds);
+      var tot = dayTotalCount(st.id);
+      if (cnt > 0) {
+        cell.classList.add(cnt >= tot ? "full" : "part");
+        cell.style.setProperty("--ac", st.color);
+      }
+      cell.innerHTML = '<span class="cal-num">' + d + "</span>" +
+        (cnt > 0 ? '<span class="cal-dot">' + (cnt >= tot ? "✓" : cnt) + "</span>" : "");
+      cell.addEventListener("click", function (ds2, idx) {
+        return function () {
+          calDate = parseD(ds2);
+          calMonthBase = new Date(ds2.slice(0, 4), +ds2.slice(5, 7) - 1, 1);
+          renderCalendar();
+          showDateSheet(ds2, D.stages[idx]);
+        };
+      }(ds, stageIdx));
+      grid.appendChild(cell);
+    }
+    document.getElementById("cal-prev").onclick = function () {
+      calMonthBase = new Date(y, m - 1, 1); renderCalendar();
+    };
+    document.getElementById("cal-next").onclick = function () {
+      calMonthBase = new Date(y, m + 1, 1); renderCalendar();
+    };
+    document.getElementById("cal-today").onclick = function () {
+      calDate = null; calMonthBase = null; renderCalendar();
+    };
+  }
+  function showDateSheet(ds, stage) {
+    document.getElementById("date-sheet-title").textContent = ds + " · " + stageCn(stage.no) + " · " + stage.name;
+    renderTaskDate(stage, ds, document.getElementById("date-sheet-tasks"), "date");
+    document.getElementById("date-sheet").classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+  function closeDateSheet() {
+    document.getElementById("date-sheet").classList.remove("open");
+    document.body.style.overflow = "";
+    renderCalendar(); renderHeader(); renderTimeline();
+  }
+
+  /* ================= 岗位薪资 ================= */
+  var jobsTab = "target";
+  var jobSearch = "";
+  function renderJobs() {
+    var tabs = document.querySelectorAll(".jobs-tab-btn");
+    tabs.forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-jtab") === jobsTab); });
+    var wrap = document.getElementById("jobs-list");
+    wrap.innerHTML = "";
+    var q = jobSearch.trim().toLowerCase();
+    if (jobsTab === "target") {
+      D.stages.forEach(function (s) {
+        if (!s.companies || !s.companies.length) return;
+        var sec = el("div", "jobs-sec");
+        var seg = stageCn(s.no) + " · " + s.name;
+        sec.innerHTML = '<div class="jobs-sec-head">' + esc(seg) + "</div>";
+        s.companies.forEach(function (cat) {
+          var blk = el("div", "company-cat");
+          var h = '<div class="company-cat-name">' + esc(cat.cat) + "</div>";
+          var hit = false;
+          if (cat.list) {
+            var names = cat.list.filter(function (n) { return !q || n.toLowerCase().indexOf(q) > -1; });
+            if (names.length) {
+              hit = true;
+              h += '<div class="chip-row">';
+              names.forEach(function (n) { h += clickableChip(n); });
+              h += "</div>";
+            }
+          } else if (cat.rows) {
+            var filtered = cat.rows.filter(function (r) { return !q || (r[0] + (r[1] || "") + (r[2] || "")).toLowerCase().indexOf(q) > -1; });
+            if (filtered.length) {
+              hit = true;
+              h += '<div class="table-fit"><table class="data-table"><thead><tr><th>公司</th><th>岗位</th><th>关键要求</th></tr></thead><tbody>';
+              filtered.forEach(function (r) { h += "<tr>" + coCell(r[0]) + "<td>" + esc(r[1]) + "</td><td>" + esc(r[2]) + "</td></tr>"; });
+              h += "</tbody></table></div>";
+            }
+          }
+          if (hit) {
+            blk.innerHTML = h;
+            sec.appendChild(blk);
+          }
+        });
+        if (sec.children.length > 1) wrap.appendChild(sec);
+      });
+    } else {
+      /* 薪资参考：折叠分类 + 标签 */
+      var intro = D.salaryIntro;
+      var ic = el("div", "salary-intro");
+      var legend = '<div class="salary-legend">' +
+        '<span class="tag-badge" style="color:#33605F;background:#E7EFEF">国内</span>' +
+        '<span class="tag-badge" style="color:#1E2A3E;background:#EDF0F5">海外</span>' +
+        '<span class="tag-badge" style="color:#2E6B59;background:#E4EFEA">实习</span>' +
+        '<span class="tag-badge" style="color:#8A919C;background:#EEEFF2">未公开</span>' +
+        '<b>点分类名展开 / 收起，点公司名看简介</b>' +
+        "</div>";
+      ic.innerHTML = "<h4>" + esc(intro.title) + "</h4><p>" + esc(intro.body) + "</p>" + legend;
+      wrap.appendChild(ic);
+      var cats = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].filter(function (i) { return D.salary[i]; });
+      cats.forEach(function (i) {
+        var cat = D.salary[i];
+        var rows = cat.rows.filter(function (r) { return !q || (r[0] + (r[1] || "") + (r[2] || "") + (r[3] || "")).toLowerCase().indexOf(q) > -1; });
+        if (!rows.length) return;
+        var fold = el("div", "salary-fold");
+        var head = el("button", "salary-fold-head");
+        head.innerHTML = "<span>" + esc(cat.cat) + "</span><em>" + rows.length + " 条</em><i class='fold-arrow'></i>";
+        var body = el("div", "salary-fold-body");
+        if (q) { head.classList.add("open"); body.classList.add("open"); }
+        var h = '<div class="table-fit"><table class="data-table salary-table"><thead><tr><th>公司</th><th>岗位</th><th>薪资参考</th><th>备注</th></tr></thead><tbody>';
+        rows.forEach(function (r) {
+          h += "<tr>" + coCell(r[0]) + "<td>" + esc(r[1]) + '</td><td class="sal">' + esc(r[2]) + "</td><td><div class='cell-tags'>" + tagBadges(r) + "</div>" + esc(r[3]) + "</td></tr>";
+        });
+        h += "</tbody></table></div>";
+        body.innerHTML = h;
+        head.addEventListener("click", function () {
+          head.classList.toggle("open");
+          body.classList.toggle("open");
+        });
+        fold.appendChild(head);
+        fold.appendChild(body);
+        wrap.appendChild(fold);
+      });
+    }
+    if (!wrap.children.length) {
+      wrap.innerHTML = '<div class="empty">没有匹配的结果，换个关键词试试</div>';
+    }
+  }
+
+  /* ================= 我的 ================= */
+  function renderMe() {
+    var ts = totalStats();
+    var streak = streakDays();
+    var cur = currentStage();
+    var todayStr = dstr(today());
+    var p = stageProgress(cur, todayStr);
+    document.getElementById("me-total-pct").textContent = ts.pct + "%";
+    document.getElementById("me-total-num").textContent = ts.doneItems + " / " + ts.totalItems;
+    document.getElementById("me-streak").textContent = streak + " 天";
+    document.getElementById("me-stage-name").textContent = stageCn(cur.no) + " · " + cur.name;
+    document.getElementById("me-stage-pct").textContent = p.pct + "%";
+    var sb = document.getElementById("me-stage-bar");
+    sb.style.width = p.pct + "%";
+    var ring = document.getElementById("me-ring");
+    ring.innerHTML = ringSVG(ts.pct, 110, 9, "#3B6C70") + '<span class="ring-big">' + ts.pct + "%</span>";
+    var rl = document.getElementById("remind-list");
+    rl.innerHTML = "";
+    D.reminders.forEach(function (t, i) {
+      var row = el("div", "remind-row");
+      row.innerHTML = '<span class="remind-no">' + (i + 1) + "</span><p>" + esc(t) + "</p>";
+      rl.appendChild(row);
+    });
+  }
+
+  /* ---------- 进度分享卡 ---------- */
+  function openShareCard() {
+    var ts = totalStats();
+    var streak = streakDays();
+    var cur = currentStage();
+    var todayStr = dstr(today());
+    var p = stageProgress(cur, todayStr);
+    var card = document.getElementById("share-card");
+    card.innerHTML =
+      '<div class="share-head">' +
+        '<div class="share-logo">央</div>' +
+        "<div><div class='share-title'>央美 → 外企 · 三年之旅</div><div class='share-sub'>" + esc(cur.name) + " · " + esc(cur.time) + "</div></div>" +
+      "</div>" +
+      '<div class="share-mid">' +
+        '<div class="share-ring-wrap">' + ringSVG(ts.pct, 96, 8, "#3B6C70") + '<span class="ring-big">' + ts.pct + "%</span></div>" +
+        '<div class="share-nums"><div><b>' + ts.doneItems + "</b><span>已完成打卡项</span></div><div><b>" + streak + " 天</b><span>连续打卡</span></div></div>" +
+      "</div>" +
+      '<div class="share-bar"><div class="share-bar-head"><span>' + esc(cur.name) + " 进度</span><b>" + p.pct + "%</b></div><div class='progress-track'><i style='width:" + p.pct + "%'></i></div></div>" +
+      '<div class="share-foot">' + dstr(today()) + " · 用每一次打卡，靠近 Dream Offer ✦</div>";
+    document.getElementById("share-sheet").classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+  function closeShareSheet() {
+    document.getElementById("share-sheet").classList.remove("open");
+    document.body.style.overflow = "";
+  }
+  function exportData() {
+    var blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "打卡数据备份-" + dstr(today()) + ".json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+  function resetData() {
+    if (confirm("确定清空全部打卡记录？此操作不可恢复。")) {
+      state = { checkins: {} };
+      save();
+      renderHeader(); renderTimeline(); renderToday(); renderMe();
+    }
+  }
+
+  /* ================= 初始化 ================= */
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".tab-btn").forEach(function (b) {
+      b.addEventListener("click", function () { switchView(b.getAttribute("data-view")); });
+    });
+    document.querySelectorAll(".jobs-tab-btn").forEach(function (b) {
+      b.addEventListener("click", function () {
+        jobsTab = b.getAttribute("data-jtab");
+        renderJobs();
+      });
+    });
+    document.getElementById("jobs-search").addEventListener("input", function (e) {
+      jobSearch = e.target.value; renderJobs();
+    });
+    /* 公司弹层（事件委托，点击任意 data-co） */
+    document.addEventListener("click", function (e) {
+      var t = e.target && typeof e.target.closest === "function" ? e.target.closest("[data-co]") : null;
+      if (t) openCompany(t.getAttribute("data-co"));
+    });
+    document.getElementById("company-sheet-close").addEventListener("click", closeCompanySheet);
+    document.getElementById("company-sheet-mask").addEventListener("click", closeCompanySheet);
+    document.getElementById("stage-sheet-close").addEventListener("click", closeStageSheet);
+    document.getElementById("stage-sheet-mask").addEventListener("click", closeStageSheet);
+    document.getElementById("date-sheet-close").addEventListener("click", closeDateSheet);
+    document.getElementById("date-sheet-mask").addEventListener("click", closeDateSheet);
+    document.getElementById("btn-share").addEventListener("click", openShareCard);
+    document.getElementById("share-sheet-close").addEventListener("click", closeShareSheet);
+    document.getElementById("share-sheet-mask").addEventListener("click", closeShareSheet);
+    document.getElementById("btn-finish-all").addEventListener("click", finishAllToday);
+    document.getElementById("btn-export").addEventListener("click", exportData);
+    document.getElementById("btn-reset").addEventListener("click", resetData);
+
+    renderHeader();
+    renderTodayCounts();
+    switchView("timeline");
+  });
+})();
+</script>
+</body>
+</html>
